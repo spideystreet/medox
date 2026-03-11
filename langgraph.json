@@ -2,6 +2,9 @@
   "graphs": {
     "nephila_agent": "./src/nephila/agent/graph_agent.py:get_graph"
   },
+  "http": {
+    "app": "./src/nephila/agent/http_app.py:app"
+  },
   "python_version": "3.11",
   "dependencies": ["."],
   "env": ".env"
