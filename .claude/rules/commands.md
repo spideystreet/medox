@@ -29,6 +29,15 @@ uv run dotenv -f dbt/.env run -- uv run dbt test --project-dir dbt --profiles-di
 uv run dotenv -f .env run -- uv run langgraph dev    # UI at smith.langchain.com/studio → connect localhost:2024
 ```
 
+## Frontend
+```bash
+cd frontend && npm install           # Install dependencies
+cd frontend && npm run dev           # Dev server at localhost:5177 (proxies /api to localhost:2024)
+cd frontend && npm run build         # Production build
+cd frontend && npx playwright test   # Run E2E tests
+cd frontend && npx playwright test --ui  # Run E2E tests with UI
+```
+
 ## Quality
 ```bash
 uv run ruff check src/ scripts/ tests/

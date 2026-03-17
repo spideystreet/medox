@@ -5,7 +5,8 @@ LangGraph ReAct agent over BDPM + ANSM data.
 
 ## Tech Stack
 
-Python · LangGraph · LangChain · Dagster · dbt · PostgreSQL · ChromaDB (self-hosted)
+**Backend**: Python · LangGraph · LangChain · Dagster · dbt · PostgreSQL · ChromaDB (self-hosted)
+**Frontend**: React 18 · TypeScript · Vite · Tailwind CSS · TanStack Query
 
 ## Architecture
 
@@ -13,6 +14,8 @@ Python · LangGraph · LangChain · Dagster · dbt · PostgreSQL · ChromaDB (se
 Bronze (raw files) → Silver (PostgreSQL via dbt) → Gold (ChromaDB embeddings)
                                                           ↓
                                               LangGraph ReAct Agent
+                                                          ↓
+                                              React Frontend (Vite)
 ```
 
 ## Key directories
@@ -22,5 +25,9 @@ Bronze (raw files) → Silver (PostgreSQL via dbt) → Gold (ChromaDB embeddings
 | `src/nephila/agent/` | LangGraph agent, nodes, tools |
 | `src/nephila/pipeline/` | Dagster assets, loaders, parsers |
 | `dbt/` | dbt Silver models + contracts |
+| `frontend/` | React app (Vite + Tailwind + Playwright E2E) |
+| `frontend/src/api/` | LangGraph API client + TanStack Query hooks |
+| `frontend/src/components/` | React UI components |
+| `frontend/e2e/` | Playwright E2E tests |
 | `tests/` | pytest unit + e2e eval (`prompts.yaml`) |
 | `scripts/` | `run_eval.py` — LangSmith evaluation |

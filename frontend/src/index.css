@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #262626 transparent;
+  }
+
+  ::selection {
+    background-color: rgba(255, 255, 255, 0.15);
+  }
+
+  body {
+    overflow: hidden;
+  }
+}
+
+@layer components {
+  .pixel-border {
+    border: 2px solid #262626;
+    image-rendering: pixelated;
+  }
+
+  .pixel-shadow {
+    box-shadow:
+      4px 4px 0px #000000,
+      2px 2px 0px #1a1a1a;
+  }
+
+  .pixel-glow {
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+  }
+}
