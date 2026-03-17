@@ -232,31 +232,35 @@ export function LandingPage({ onEnter }: LandingPageProps) {
         <span className="text-[10px] uppercase tracking-[0.2em] text-text-muted">
           Powered by
         </span>
-        <div className="flex items-center gap-2">
-          <svg width="18" height="18" viewBox="0 0 20 20" className="opacity-40">
-            <g fill="currentColor" className="text-white">
-              <rect x="0" y="0" width="4" height="4" />
-              <rect x="8" y="0" width="4" height="4" />
-              <rect x="16" y="0" width="4" height="4" />
-              <rect x="0" y="4" width="4" height="4" opacity="0.7" />
-              <rect x="4" y="4" width="4" height="4" opacity="0.5" />
-              <rect x="8" y="4" width="4" height="4" opacity="0.7" />
-              <rect x="12" y="4" width="4" height="4" opacity="0.5" />
-              <rect x="16" y="4" width="4" height="4" opacity="0.7" />
-              <rect x="0" y="8" width="4" height="4" />
-              <rect x="4" y="8" width="4" height="4" opacity="0.7" />
-              <rect x="8" y="8" width="4" height="4" />
-              <rect x="12" y="8" width="4" height="4" opacity="0.7" />
-              <rect x="16" y="8" width="4" height="4" />
-              <rect x="0" y="12" width="4" height="4" opacity="0.7" />
-              <rect x="8" y="12" width="4" height="4" opacity="0.7" />
-              <rect x="16" y="12" width="4" height="4" opacity="0.7" />
-              <rect x="0" y="16" width="4" height="4" />
-              <rect x="8" y="16" width="4" height="4" />
-              <rect x="16" y="16" width="4" height="4" />
-            </g>
+        <div className="flex items-center gap-2.5">
+          {/* Mistral color logo — pixel "M" with yellow→orange→red gradient */}
+          <svg width="20" height="20" viewBox="0 0 20 20">
+            {/* Row 1 — Yellow */}
+            <rect x="4" y="0" width="4" height="4" fill="#FFD700" />
+            <rect x="16" y="0" width="4" height="4" fill="#FFD700" />
+            {/* Row 2 — Yellow-Orange */}
+            <rect x="0" y="4" width="4" height="4" fill="#FFA800" />
+            <rect x="4" y="4" width="4" height="4" fill="#FFC000" />
+            <rect x="12" y="4" width="4" height="4" fill="#FFA800" />
+            <rect x="16" y="4" width="4" height="4" fill="#FFC000" />
+            {/* Row 3 — Orange */}
+            <rect x="0" y="8" width="4" height="4" fill="#FF8C00" />
+            <rect x="4" y="8" width="4" height="4" fill="#FF8C00" />
+            <rect x="8" y="8" width="4" height="4" fill="#FF8C00" />
+            <rect x="12" y="8" width="4" height="4" fill="#FF8C00" />
+            <rect x="16" y="8" width="4" height="4" fill="#FF8C00" />
+            {/* Row 4 — Red-Orange */}
+            <rect x="0" y="12" width="4" height="4" fill="#FF4500" />
+            <rect x="8" y="12" width="4" height="4" fill="#FF4500" />
+            <rect x="16" y="12" width="4" height="4" fill="#FF4500" />
+            {/* Row 5 — Red */}
+            <rect x="0" y="16" width="4" height="4" fill="#E00000" />
+            <rect x="4" y="16" width="4" height="4" fill="#E00000" />
+            <rect x="8" y="16" width="4" height="4" fill="#E00000" />
+            <rect x="12" y="16" width="4" height="4" fill="#E00000" />
+            <rect x="16" y="16" width="4" height="4" fill="#E00000" />
           </svg>
-          <span className="font-pixel text-pixel-xs text-text-muted opacity-60">
+          <span className="text-xs text-text-muted opacity-70 tracking-wide">
             Mistral AI
           </span>
         </div>
