@@ -138,3 +138,46 @@
 .animate-float {
   animation: float 4s ease-in-out infinite;
 }
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.animate-blink {
+  animation: blink 0.6s step-end infinite;
+}
+
+@keyframes glitch {
+  0%, 100% { transform: translate(0); }
+  20% { transform: translate(-2px, 1px); }
+  40% { transform: translate(2px, -1px); }
+  60% { transform: translate(-1px, -2px); }
+  80% { transform: translate(1px, 2px); }
+}
+
+@keyframes glitch-1 {
+  0%, 100% { clip-path: inset(0 0 80% 0); transform: translate(-3px, 0); }
+  25% { clip-path: inset(20% 0 60% 0); transform: translate(3px, 0); }
+  50% { clip-path: inset(40% 0 30% 0); transform: translate(-2px, 0); }
+  75% { clip-path: inset(60% 0 10% 0); transform: translate(2px, 0); }
+}
+
+@keyframes glitch-2 {
+  0%, 100% { clip-path: inset(70% 0 0 0); transform: translate(3px, 0); }
+  25% { clip-path: inset(50% 0 20% 0); transform: translate(-3px, 0); }
+  50% { clip-path: inset(10% 0 50% 0); transform: translate(2px, 0); }
+  75% { clip-path: inset(30% 0 40% 0); transform: translate(-2px, 0); }
+}
+
+.animate-glitch {
+  animation: glitch 0.2s ease-in-out;
+}
+
+.animate-glitch-1 {
+  animation: glitch-1 0.2s ease-in-out;
+}
+
+.animate-glitch-2 {
+  animation: glitch-2 0.2s ease-in-out;
+}
