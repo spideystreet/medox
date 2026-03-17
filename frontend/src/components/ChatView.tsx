@@ -4,7 +4,12 @@ import { ChatMessage } from "./ChatMessage";
 import { ChatInput } from "./ChatInput";
 import { WelcomeScreen } from "./WelcomeScreen";
 import { useThreadState, useCreateThread } from "../api/hooks";
-import { streamMessage, updateThreadMetadata, type Message } from "../api/client";
+import {
+  streamMessage,
+  updateThreadMetadata,
+  createThread as apiCreateThread,
+  type Message,
+} from "../api/client";
 
 interface ChatViewProps {
   threadId: string | null;
@@ -13,18 +18,25 @@ interface ChatViewProps {
 }
 
 export function ChatView({ threadId, onThreadCreated, onMenuClick }: ChatViewProps) {
-  const { data: threadState } = useThreadState(threadId);
+  const { data: threadState, isError: threadStateError } = useThreadState(threadId);
   const createThread = useCreateThread();
   const queryClient = useQueryClient();
 
   const [streamingContent, setStreamingContent] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [optimisticMessages, setOptimisticMessages] = useState<Message[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const isFirstMessageRef = useRef(false);
 
   const messages = threadState?.values?.messages ?? [];
   const displayMessages = [...messages, ...optimisticMessages];
+
+  // If stored thread doesn't exist on server, reset
+  useEffect(() => {
+    if (threadStateError && threadId) {
+      onThreadCreated("");
+    }
+  }, [threadStateError, threadId, onThreadCreated]);
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -35,16 +47,19 @@ export function ChatView({ threadId, onThreadCreated, onMenuClick }: ChatViewPro
   }, [displayMessages.length, streamingContent, scrollToBottom]);
 
   const handleSend = async (content: string) => {
+    setErrorMessage(null);
     let currentThreadId = threadId;
+    let isFirstMessage = false;
 
+    // Always create a fresh thread if none selected
     if (!currentThreadId) {
       const thread = await createThread.mutateAsync();
       currentThreadId = thread.thread_id;
       onThreadCreated(currentThreadId);
-      isFirstMessageRef.current = true;
+      isFirstMessage = true;
     } else {
-      const existingMessages = messages.filter((m) => m.type === "human");
-      isFirstMessageRef.current = existingMessages.length === 0;
+      const existingHuman = messages.filter((m) => m.type === "human");
+      isFirstMessage = existingHuman.length === 0;
     }
 
     setOptimisticMessages([
@@ -53,35 +68,56 @@ export function ChatView({ threadId, onThreadCreated, onMenuClick }: ChatViewPro
     setIsStreaming(true);
     setStreamingContent("");
 
-    // Set title from first message
-    if (isFirstMessageRef.current) {
+    if (isFirstMessage) {
       const title = content.length > 50 ? content.slice(0, 50) + "..." : content;
       updateThreadMetadata(currentThreadId, { title }).catch(() => {});
     }
 
-    await streamMessage(currentThreadId, content, {
-      onToken: (token) => {
-        setStreamingContent((prev) => prev + token);
-      },
-      onDone: () => {
-        setIsStreaming(false);
-        setStreamingContent("");
-        setOptimisticMessages([]);
-        queryClient.invalidateQueries({
-          queryKey: ["thread-state", currentThreadId],
-        });
-        queryClient.invalidateQueries({ queryKey: ["threads"] });
-      },
-      onError: (error) => {
-        console.error("Stream error:", error);
-        setIsStreaming(false);
-        setStreamingContent("");
-        setOptimisticMessages([]);
-      },
-    });
+    const doStream = async (tid: string) => {
+      await streamMessage(tid, content, {
+        onToken: (token) => {
+          setStreamingContent((prev) => prev + token);
+        },
+        onDone: (fullMsg) => {
+          setIsStreaming(false);
+          setStreamingContent("");
+          setOptimisticMessages([]);
+          if (!fullMsg) {
+            setErrorMessage("No response received. The agent may be unavailable.");
+          }
+          queryClient.invalidateQueries({
+            queryKey: ["thread-state", tid],
+          });
+          queryClient.invalidateQueries({ queryKey: ["threads"] });
+        },
+        onError: async (error) => {
+          // If the thread is invalid, try creating a new one
+          if (tid === currentThreadId) {
+            try {
+              const newThread = await apiCreateThread();
+              const newTitle = content.length > 50 ? content.slice(0, 50) + "..." : content;
+              updateThreadMetadata(newThread.thread_id, { title: newTitle }).catch(() => {});
+              onThreadCreated(newThread.thread_id);
+              setStreamingContent("");
+              await doStream(newThread.thread_id);
+              return;
+            } catch {
+              // Fall through to error display
+            }
+          }
+          console.error("Stream error:", error);
+          setIsStreaming(false);
+          setStreamingContent("");
+          setOptimisticMessages([]);
+          setErrorMessage("Connection error. Please try again.");
+        },
+      });
+    };
+
+    await doStream(currentThreadId);
   };
 
-  const hasMessages = displayMessages.length > 0 || streamingContent;
+  const hasMessages = displayMessages.length > 0 || streamingContent || errorMessage;
 
   return (
     <div className="flex-1 flex flex-col min-w-0 bg-surface">
@@ -125,6 +161,7 @@ export function ChatView({ threadId, onThreadCreated, onMenuClick }: ChatViewPro
               <ChatMessage role="ai" content={streamingContent} isStreaming />
             )}
             {isStreaming && !streamingContent && <TypingIndicator />}
+            {errorMessage && <ErrorBanner message={errorMessage} />}
             <div ref={messagesEndRef} />
           </div>
         </div>
@@ -142,6 +179,19 @@ function TypingIndicator() {
         <span className="w-2 h-2 rounded-full bg-text-muted animate-bounce [animation-delay:0ms]" />
         <span className="w-2 h-2 rounded-full bg-text-muted animate-bounce [animation-delay:150ms]" />
         <span className="w-2 h-2 rounded-full bg-text-muted animate-bounce [animation-delay:300ms]" />
+      </div>
+    </div>
+  );
+}
+
+function ErrorBanner({ message }: { message: string }) {
+  return (
+    <div
+      className="flex justify-start mb-4 animate-fade-in"
+      data-testid="error-banner"
+    >
+      <div className="px-4 py-3 rounded-lg border bg-danger-bg border-danger-border text-danger text-sm">
+        {message}
       </div>
     </div>
   );

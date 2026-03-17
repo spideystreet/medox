@@ -123,6 +123,7 @@ export async function streamMessage(
   const decoder = new TextDecoder();
   let buffer = "";
   let fullMessage = "";
+  let currentEvent = "";
 
   while (true) {
     const { done, value } = await reader.read();
@@ -134,11 +135,16 @@ export async function streamMessage(
 
     for (const line of lines) {
       if (line.startsWith("event: ")) {
-        const eventType = line.slice(7).trim();
-        if (eventType === "end") {
+        currentEvent = line.slice(7).trim();
+        if (currentEvent === "end") {
           callbacks.onDone(fullMessage);
           return;
         }
+        if (currentEvent === "error") {
+          // Next data line will contain error details; read it and call onError
+          continue;
+        }
+        continue;
       }
 
       if (!line.startsWith("data: ")) continue;
@@ -149,29 +155,39 @@ export async function streamMessage(
       try {
         const parsed = JSON.parse(data);
 
-        // Handle messages stream mode
-        if (Array.isArray(parsed) && parsed.length === 2) {
-          const [metadata, chunk] = parsed;
-          if (
-            metadata?.langgraph_node === "agent" &&
-            chunk?.content &&
-            typeof chunk.content === "string"
-          ) {
-            fullMessage += chunk.content;
-            callbacks.onToken(chunk.content);
+        // Handle error events from the server
+        if (currentEvent === "error") {
+          const errMsg = parsed?.message || parsed?.error || "Unknown server error";
+          callbacks.onError(new Error(errMsg));
+          return;
+        }
+
+        // messages/partial: accumulated AI content as array with one object
+        if (
+          currentEvent === "messages/partial" &&
+          Array.isArray(parsed) &&
+          parsed.length > 0
+        ) {
+          const msg = parsed[0];
+          if (msg?.type === "ai" && typeof msg.content === "string") {
+            const newContent = msg.content;
+            if (newContent.length > fullMessage.length) {
+              const delta = newContent.slice(fullMessage.length);
+              fullMessage = newContent;
+              callbacks.onToken(delta);
+            }
           }
         }
 
-        // Handle final state with complete AI message
-        if (parsed?.messages) {
-          const aiMessages = parsed.messages.filter(
-            (m: Message) => m.type === "ai" && m.content,
-          );
-          if (aiMessages.length > 0) {
-            const lastAi = aiMessages[aiMessages.length - 1];
-            if (lastAi.content && typeof lastAi.content === "string") {
-              fullMessage = lastAi.content;
-            }
+        // messages/complete: final AI message
+        if (
+          currentEvent === "messages/complete" &&
+          Array.isArray(parsed) &&
+          parsed.length > 0
+        ) {
+          const msg = parsed[0];
+          if (msg?.type === "ai" && typeof msg.content === "string") {
+            fullMessage = msg.content;
           }
         }
       } catch {
