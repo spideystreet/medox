@@ -1,17 +1,7 @@
-import { test, expect, type Page } from "@playwright/test";
-
-/** Bypass landing page by setting localStorage flag before navigation. */
-async function bypassLanding(page: Page) {
-  await page.addInitScript(() => {
-    localStorage.setItem("nephila:entered", "true");
-  });
-}
+import { test, expect } from "@playwright/test";
 
 test.describe("Nephila Landing Page", () => {
-  test("shows landing page on first visit", async ({ page }) => {
-    await page.addInitScript(() => {
-      localStorage.removeItem("nephila:entered");
-    });
+  test("shows landing page at /", async ({ page }) => {
     await page.goto("/");
     await expect(page.getByTestId("enter-app-btn")).toBeVisible();
     await expect(page.getByText("Nephila")).toBeVisible();
@@ -22,27 +12,18 @@ test.describe("Nephila Landing Page", () => {
     await expect(page.getByText("Mistral AI")).toBeVisible();
   });
 
-  test("enter button navigates to chat app", async ({ page }) => {
-    await page.addInitScript(() => {
-      localStorage.removeItem("nephila:entered");
-    });
+  test("enter button navigates to /chat", async ({ page }) => {
     await page.goto("/");
     await page.getByTestId("enter-app-btn").click();
+    await expect(page).toHaveURL(/\/chat/);
     await expect(page.getByTestId("app")).toBeVisible();
     await expect(page.getByTestId("welcome-screen")).toBeVisible();
-  });
-
-  test("skips landing page on return visit", async ({ page }) => {
-    await bypassLanding(page);
-    await page.goto("/");
-    await expect(page.getByTestId("app")).toBeVisible();
   });
 });
 
 test.describe("Nephila App", () => {
   test.beforeEach(async ({ page }) => {
-    await bypassLanding(page);
-    await page.goto("/");
+    await page.goto("/chat");
   });
 
   test("loads the app with welcome screen", async ({ page }) => {
@@ -98,8 +79,7 @@ test.describe("Nephila App", () => {
 
 test.describe("Nephila Sidebar", () => {
   test.beforeEach(async ({ page }) => {
-    await bypassLanding(page);
-    await page.goto("/");
+    await page.goto("/chat");
   });
 
   test("new chat button creates a conversation", async ({ page }) => {
@@ -140,7 +120,7 @@ test.describe("Nephila Sidebar", () => {
       });
     });
 
-    await page.goto("/");
+    await page.goto("/chat");
     await expect(page.getByText("No conversations yet")).toBeVisible();
   });
 
@@ -166,7 +146,7 @@ test.describe("Nephila Sidebar", () => {
       });
     });
 
-    await page.goto("/");
+    await page.goto("/chat");
     const items = page.getByTestId("thread-item");
     await expect(items).toHaveCount(2);
     await expect(items.first()).toContainText("Interactions amiodarone");
@@ -175,8 +155,6 @@ test.describe("Nephila Sidebar", () => {
 
 test.describe("Nephila Chat Messages", () => {
   test("sends a message and displays it", async ({ page }) => {
-    await bypassLanding(page);
-
     await page.route("**/api/threads", async (route) => {
       if (route.request().method() === "POST") {
         const url = route.request().url();
@@ -234,7 +212,7 @@ test.describe("Nephila Chat Messages", () => {
       });
     });
 
-    await page.goto("/");
+    await page.goto("/chat");
     const input = page.getByTestId("chat-input");
     await input.fill("Test question");
     await page.getByTestId("send-btn").click();
@@ -248,8 +226,6 @@ test.describe("Nephila Chat Messages", () => {
   test("displays warning banner for critical interactions", async ({
     page,
   }) => {
-    await bypassLanding(page);
-
     await page.route("**/api/threads/search", async (route) => {
       await route.fulfill({
         status: 200,
@@ -301,7 +277,7 @@ test.describe("Nephila Chat Messages", () => {
       });
     });
 
-    await page.goto("/");
+    await page.goto("/chat");
     await page.getByTestId("chat-input").fill("interactions?");
     await page.getByTestId("send-btn").click();
 
@@ -319,8 +295,7 @@ test.describe("Nephila Mobile", () => {
   test.use({ viewport: { width: 375, height: 812 } });
 
   test("sidebar is hidden on mobile by default @mobile", async ({ page }) => {
-    await bypassLanding(page);
-    await page.goto("/");
+    await page.goto("/chat");
     const sidebar = page.getByTestId("sidebar");
     await expect(sidebar).toHaveCSS("transform", /matrix/);
     const transform = await sidebar.evaluate(
@@ -330,8 +305,7 @@ test.describe("Nephila Mobile", () => {
   });
 
   test("hamburger menu opens sidebar on mobile @mobile", async ({ page }) => {
-    await bypassLanding(page);
-    await page.goto("/");
+    await page.goto("/chat");
     await page.getByTestId("menu-btn").click();
     await expect(page.getByTestId("sidebar-overlay")).toBeVisible();
   });
