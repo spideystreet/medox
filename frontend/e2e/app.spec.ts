@@ -1,7 +1,47 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, type Page } from "@playwright/test";
+
+/** Bypass landing page by setting localStorage flag before navigation. */
+async function bypassLanding(page: Page) {
+  await page.addInitScript(() => {
+    localStorage.setItem("nephila:entered", "true");
+  });
+}
+
+test.describe("Nephila Landing Page", () => {
+  test("shows landing page on first visit", async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.removeItem("nephila:entered");
+    });
+    await page.goto("/");
+    await expect(page.getByTestId("enter-app-btn")).toBeVisible();
+    await expect(page.getByText("Nephila")).toBeVisible();
+    await expect(
+      page.getByText("Assistant pharmaceutique intelligent"),
+    ).toBeVisible();
+    await expect(page.getByText("Powered by")).toBeVisible();
+    await expect(page.getByText("Mistral AI")).toBeVisible();
+  });
+
+  test("enter button navigates to chat app", async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.removeItem("nephila:entered");
+    });
+    await page.goto("/");
+    await page.getByTestId("enter-app-btn").click();
+    await expect(page.getByTestId("app")).toBeVisible();
+    await expect(page.getByTestId("welcome-screen")).toBeVisible();
+  });
+
+  test("skips landing page on return visit", async ({ page }) => {
+    await bypassLanding(page);
+    await page.goto("/");
+    await expect(page.getByTestId("app")).toBeVisible();
+  });
+});
 
 test.describe("Nephila App", () => {
   test.beforeEach(async ({ page }) => {
+    await bypassLanding(page);
     await page.goto("/");
   });
 
@@ -58,11 +98,11 @@ test.describe("Nephila App", () => {
 
 test.describe("Nephila Sidebar", () => {
   test.beforeEach(async ({ page }) => {
+    await bypassLanding(page);
     await page.goto("/");
   });
 
   test("new chat button creates a conversation", async ({ page }) => {
-    // Mock the API
     await page.route("**/api/threads", async (route) => {
       if (route.request().method() === "POST") {
         const url = route.request().url();
@@ -88,7 +128,6 @@ test.describe("Nephila Sidebar", () => {
     });
 
     await page.getByTestId("new-chat-btn").click();
-    // After creating, the welcome screen should still show (empty thread)
     await expect(page.getByTestId("chat-input")).toBeVisible();
   });
 
@@ -136,7 +175,8 @@ test.describe("Nephila Sidebar", () => {
 
 test.describe("Nephila Chat Messages", () => {
   test("sends a message and displays it", async ({ page }) => {
-    // Mock thread creation
+    await bypassLanding(page);
+
     await page.route("**/api/threads", async (route) => {
       if (route.request().method() === "POST") {
         const url = route.request().url();
@@ -161,11 +201,10 @@ test.describe("Nephila Chat Messages", () => {
       }
     });
 
-    // Mock streaming response
     await page.route("**/api/threads/*/runs/stream", async (route) => {
       const body = [
         'event: metadata\ndata: {"run_id": "r1"}\n\n',
-        'data: [{"langgraph_node": "agent"}, {"content": "Test response from Nephila"}]\n\n',
+        'event: messages/partial\ndata: [{"content": "Test response from Nephila", "type": "ai", "id": "a1"}]\n\n',
         "event: end\ndata: null\n\n",
       ].join("");
 
@@ -176,7 +215,6 @@ test.describe("Nephila Chat Messages", () => {
       });
     });
 
-    // Mock thread state after message
     await page.route("**/api/threads/*/state", async (route) => {
       await route.fulfill({
         status: 200,
@@ -184,11 +222,7 @@ test.describe("Nephila Chat Messages", () => {
         body: JSON.stringify({
           values: {
             messages: [
-              {
-                type: "human",
-                content: "Test question",
-                id: "msg-1",
-              },
+              { type: "human", content: "Test question", id: "msg-1" },
               {
                 type: "ai",
                 content: "Test response from Nephila",
@@ -201,13 +235,10 @@ test.describe("Nephila Chat Messages", () => {
     });
 
     await page.goto("/");
-
-    // Type and send
     const input = page.getByTestId("chat-input");
     await input.fill("Test question");
     await page.getByTestId("send-btn").click();
 
-    // User message should appear
     await expect(page.getByTestId("user-message")).toBeVisible();
     await expect(page.getByTestId("user-message")).toContainText(
       "Test question",
@@ -217,7 +248,8 @@ test.describe("Nephila Chat Messages", () => {
   test("displays warning banner for critical interactions", async ({
     page,
   }) => {
-    // Mock everything for a warning response
+    await bypassLanding(page);
+
     await page.route("**/api/threads/search", async (route) => {
       await route.fulfill({
         status: 200,
@@ -245,7 +277,7 @@ test.describe("Nephila Chat Messages", () => {
       await route.fulfill({
         status: 200,
         contentType: "text/event-stream",
-        body: 'data: [{"langgraph_node": "agent"}, {"content": "done"}]\n\nevent: end\ndata: null\n\n',
+        body: 'event: messages/partial\ndata: [{"content": "done", "type": "ai", "id": "a1"}]\n\nevent: end\ndata: null\n\n',
       });
     });
 
@@ -273,13 +305,11 @@ test.describe("Nephila Chat Messages", () => {
     await page.getByTestId("chat-input").fill("interactions?");
     await page.getByTestId("send-btn").click();
 
-    // Wait for state to load
     await expect(page.getByTestId("warning-banner")).toBeVisible({
       timeout: 5000,
     });
     await expect(page.getByTestId("warning-banner")).toContainText("DANGER");
 
-    // Check CIS badges
     const badges = page.getByTestId("cis-badge");
     await expect(badges).toHaveCount(2);
   });
@@ -289,18 +319,18 @@ test.describe("Nephila Mobile", () => {
   test.use({ viewport: { width: 375, height: 812 } });
 
   test("sidebar is hidden on mobile by default @mobile", async ({ page }) => {
+    await bypassLanding(page);
     await page.goto("/");
     const sidebar = page.getByTestId("sidebar");
-    // Sidebar translated off-screen via -translate-x-full (matrix with negative x)
     await expect(sidebar).toHaveCSS("transform", /matrix/);
     const transform = await sidebar.evaluate(
       (el) => getComputedStyle(el).transform,
     );
-    // matrix(1, 0, 0, 1, -288, 0) means translated left
     expect(transform).toMatch(/-\d+/);
   });
 
   test("hamburger menu opens sidebar on mobile @mobile", async ({ page }) => {
+    await bypassLanding(page);
     await page.goto("/");
     await page.getByTestId("menu-btn").click();
     await expect(page.getByTestId("sidebar-overlay")).toBeVisible();
