@@ -27,8 +27,8 @@ export function ChatMessage({ role, content, isStreaming }: ChatMessageProps) {
 
   if (isUser) {
     return (
-      <div className="flex justify-end mb-4" data-testid="user-message">
-        <div className="max-w-[80%] md:max-w-[60%] px-4 py-3 rounded-2xl rounded-br-sm bg-surface-overlay border border-surface-border text-text-primary text-sm">
+      <div className="flex justify-end mb-4 animate-slide-in-right" data-testid="user-message">
+        <div className="max-w-[80%] md:max-w-[60%] px-4 py-3 rounded-2xl rounded-br-sm bg-surface-overlay border border-surface-border text-text-primary text-sm hover:border-text-muted transition-colors duration-200">
           {content}
         </div>
       </div>
@@ -36,7 +36,7 @@ export function ChatMessage({ role, content, isStreaming }: ChatMessageProps) {
   }
 
   return (
-    <div className="flex justify-start mb-6" data-testid="ai-message">
+    <div className="flex justify-start mb-6 animate-slide-in-left" data-testid="ai-message">
       <div className="max-w-[85%] md:max-w-[70%]">
         {hasWarning && (
           <div
@@ -50,7 +50,7 @@ export function ChatMessage({ role, content, isStreaming }: ChatMessageProps) {
             `}
             data-testid="warning-banner"
           >
-            <span className="font-pixel text-pixel-xs mr-2">
+            <span className="font-pixel text-pixel-xs mr-2 animate-pulse">
               {hasDanger ? "DANGER" : "ALERTE"}
             </span>
           </div>

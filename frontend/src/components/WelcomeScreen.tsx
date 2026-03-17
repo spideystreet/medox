@@ -8,9 +8,9 @@ export function WelcomeScreen({ onSuggestionClick }: WelcomeScreenProps) {
       className="flex-1 flex flex-col items-center justify-center px-4"
       data-testid="welcome-screen"
     >
-      <div className="text-center space-y-4">
+      <div className="text-center space-y-4 animate-fade-in">
         {/* Pixel art spider web icon */}
-        <div className="mx-auto w-16 h-16 relative mb-2">
+        <div className="mx-auto w-16 h-16 relative mb-2 animate-pulse-slow">
           <svg viewBox="0 0 64 64" className="w-full h-full">
             <g fill="#262626">
               {/* Simple pixel web pattern */}
@@ -62,8 +62,11 @@ export function WelcomeScreen({ onSuggestionClick }: WelcomeScreenProps) {
                 px-4 py-3 text-left text-sm text-text-secondary
                 bg-surface-raised border border-surface-border rounded-lg
                 hover:bg-surface-hover hover:text-text-primary hover:border-text-muted
-                cursor-pointer transition-colors duration-150
+                hover:translate-x-1
+                cursor-pointer transition-all duration-200
+                animate-fade-in-up
               "
+              style={{ animationDelay: `${i * 100}ms` }}
               data-testid="suggestion"
             >
               {q}

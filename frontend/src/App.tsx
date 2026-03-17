@@ -2,11 +2,38 @@ import { useState, useEffect, useCallback } from "react";
 import { Sidebar } from "./components/Sidebar";
 import { ChatView } from "./components/ChatView";
 
+const STORAGE_KEY = "nephila:activeThread";
+
+function getStoredThreadId(): string | null {
+  try {
+    return localStorage.getItem(STORAGE_KEY);
+  } catch {
+    return null;
+  }
+}
+
+function storeThreadId(threadId: string | null) {
+  try {
+    if (threadId) {
+      localStorage.setItem(STORAGE_KEY, threadId);
+    } else {
+      localStorage.removeItem(STORAGE_KEY);
+    }
+  } catch {
+    // localStorage unavailable
+  }
+}
+
 export function App() {
-  const [activeThreadId, setActiveThreadId] = useState<string | null>(null);
+  const [activeThreadId, setActiveThreadId] = useState<string | null>(
+    getStoredThreadId,
+  );
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // Close sidebar on desktop resize
+  useEffect(() => {
+    storeThreadId(activeThreadId);
+  }, [activeThreadId]);
+
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth >= 768) {

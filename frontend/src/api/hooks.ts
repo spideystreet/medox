@@ -12,10 +12,13 @@ export function useThreads() {
     queryKey: ["threads"],
     queryFn: listThreads,
     select: (threads: Thread[]) =>
-      [...threads].sort(
-        (a, b) =>
-          new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime(),
-      ),
+      [...threads]
+        .filter((t) => t.metadata?.title)
+        .sort(
+          (a, b) =>
+            new Date(b.updated_at).getTime() -
+            new Date(a.updated_at).getTime(),
+        ),
   });
 }
 

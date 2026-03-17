@@ -46,6 +46,19 @@ export async function listThreads(): Promise<Thread[]> {
   return res.json();
 }
 
+export async function updateThreadMetadata(
+  threadId: string,
+  metadata: Record<string, unknown>,
+): Promise<Thread> {
+  const res = await fetch(`${API_BASE}/threads/${threadId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ metadata }),
+  });
+  if (!res.ok) throw new Error(`Failed to update thread: ${res.status}`);
+  return res.json();
+}
+
 export async function deleteThread(threadId: string): Promise<void> {
   const res = await fetch(`${API_BASE}/threads/${threadId}`, {
     method: "DELETE",
