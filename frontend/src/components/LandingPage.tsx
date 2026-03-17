@@ -59,67 +59,6 @@ function GlitchTitle() {
   );
 }
 
-function SpiderWeb() {
-  const [step, setStep] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setStep((s) => {
-        if (s >= 4) {
-          clearInterval(interval);
-          return s;
-        }
-        return s + 1;
-      });
-    }, 300);
-    return () => clearInterval(interval);
-  }, []);
-
-  return (
-    <svg viewBox="0 0 96 96" className="w-full h-full">
-      {/* Cross - step 1 */}
-      <g fill="#262626" className={`transition-opacity duration-500 ${step >= 1 ? "opacity-100" : "opacity-0"}`}>
-        <rect x="46" y="0" width="4" height="96" />
-        <rect x="0" y="46" width="96" height="4" />
-      </g>
-      {/* Diagonals top - step 2 */}
-      <g fill="#1a1a1a" className={`transition-opacity duration-500 ${step >= 2 ? "opacity-100" : "opacity-0"}`}>
-        <rect x="12" y="12" width="4" height="4" />
-        <rect x="20" y="20" width="4" height="4" />
-        <rect x="28" y="28" width="4" height="4" />
-        <rect x="36" y="36" width="4" height="4" />
-        <rect x="56" y="36" width="4" height="4" />
-        <rect x="64" y="28" width="4" height="4" />
-        <rect x="72" y="20" width="4" height="4" />
-        <rect x="80" y="12" width="4" height="4" />
-      </g>
-      {/* Diagonals bottom - step 3 */}
-      <g fill="#1a1a1a" className={`transition-opacity duration-500 ${step >= 3 ? "opacity-100" : "opacity-0"}`}>
-        <rect x="12" y="80" width="4" height="4" />
-        <rect x="20" y="72" width="4" height="4" />
-        <rect x="28" y="64" width="4" height="4" />
-        <rect x="36" y="56" width="4" height="4" />
-        <rect x="56" y="56" width="4" height="4" />
-        <rect x="64" y="64" width="4" height="4" />
-        <rect x="72" y="72" width="4" height="4" />
-        <rect x="80" y="80" width="4" height="4" />
-      </g>
-      {/* Inner ring - step 3 */}
-      <g fill="#333" className={`transition-opacity duration-500 ${step >= 3 ? "opacity-100" : "opacity-0"}`}>
-        <rect x="30" y="46" width="4" height="4" />
-        <rect x="62" y="46" width="4" height="4" />
-        <rect x="46" y="30" width="4" height="4" />
-        <rect x="46" y="62" width="4" height="4" />
-      </g>
-      {/* Center core - step 4 */}
-      <g className={`transition-opacity duration-300 ${step >= 4 ? "opacity-100" : "opacity-0"}`}>
-        <rect x="44" y="44" width="8" height="8" fill="#505050" />
-        <rect x="46" y="46" width="4" height="4" fill="#888" />
-      </g>
-    </svg>
-  );
-}
-
 export function LandingPage({ onEnter }: LandingPageProps) {
   const [showContent, setShowContent] = useState(false);
 
@@ -168,11 +107,6 @@ export function LandingPage({ onEnter }: LandingPageProps) {
       {/* Main content */}
       <div className="flex-1 flex items-center justify-center px-6">
         <div className="relative z-10 text-center max-w-2xl mx-auto">
-          {/* Animated spider web */}
-          <div className="mx-auto w-20 h-20 mb-8">
-            <SpiderWeb />
-          </div>
-
           {/* Glitch title */}
           <div className="mb-4">
             <GlitchTitle />
