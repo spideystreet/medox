@@ -18,10 +18,10 @@ class PipelineSettings(BaseSettings):
     chroma_host: str
     chroma_port: int
 
-    # OpenRouter (LLM only — embeddings are local)
-    openrouter_api_key: str  # ${OPENROUTER_API_KEY}
-    openrouter_base_url: str  # ${OPENROUTER_BASE_URL}
-    openrouter_model: str  # ${OPENROUTER_MODEL}
+    # OpenRouter (optional — only needed for Dagster pipeline, not for BYOK agent)
+    openrouter_api_key: str = ""
+    openrouter_base_url: str = "https://openrouter.ai/api/v1"
+    openrouter_model: str = "mistralai/ministral-8b-2512"
 
     # Embeddings (local HuggingFace model via sentence-transformers)
     embedding_model: str = "intfloat/multilingual-e5-base"  # ${EMBEDDING_MODEL}
