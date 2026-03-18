@@ -3,10 +3,12 @@ Nephila ReAct agent — LangGraph graph definition.
 Architecture: agent (LLM + tools) → guardrail → response|warn
 """
 
+import os
 import threading
 from typing import Any
 
 from langchain_core.messages import SystemMessage
+from langchain_core.runnables import RunnableConfig
 from langchain_openai import ChatOpenAI
 from langgraph.graph import END, START, StateGraph
 from langgraph.graph.state import CompiledStateGraph
@@ -44,6 +46,35 @@ FORMAT DE RÉPONSE — STRICT :
 - Énoncer le niveau d'interaction, le risque et la précaution clé."""
 
 
+def _get_llm(config: RunnableConfig) -> ChatOpenAI:
+    """Build LLM from user-provided API key (configurable) or env fallback."""
+    user_key = (config.get("configurable") or {}).get("api_key")
+
+    if user_key:
+        # Detect provider from key prefix
+        if user_key.startswith("sk-or-"):
+            base_url = os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
+            model = os.getenv("OPENROUTER_MODEL", "mistralai/ministral-8b-2512")
+        else:
+            base_url = "https://api.mistral.ai/v1"
+            model = "ministral-8b-latest"
+        return ChatOpenAI(
+            base_url=base_url,
+            api_key=SecretStr(user_key),
+            model=model,
+            default_headers={"X-Title": "Nephila"},
+        )
+
+    # Fallback to env vars
+    settings = PipelineSettings()
+    return ChatOpenAI(
+        base_url=settings.openrouter_base_url,
+        api_key=SecretStr(settings.openrouter_api_key),
+        model=settings.openrouter_model,
+        default_headers={"X-Title": "Nephila"},
+    )
+
+
 def routing(state: AgentState) -> str:
     """Conditional edge: route to tools if there are pending tool calls, else to guardrail."""
     last = state["messages"][-1]
@@ -53,18 +84,9 @@ def routing(state: AgentState) -> str:
 
 
 def build_agent() -> CompiledStateGraph:  # type: ignore[type-arg]
-    settings = PipelineSettings()
-
-    llm = ChatOpenAI(
-        base_url=settings.openrouter_base_url,
-        api_key=SecretStr(settings.openrouter_api_key),
-        model=settings.openrouter_model,
-        default_headers={"X-Title": "Nephila"},
-    )
-    # Sequential tool calls required: guardrail inspects ALL tool results before routing.
-    llm_with_tools = llm.bind_tools(TOOLS, parallel_tool_calls=False)
-
-    def agent_node(state: AgentState) -> dict[str, Any]:
+    def agent_node(state: AgentState, config: RunnableConfig) -> dict[str, Any]:
+        llm = _get_llm(config)
+        llm_with_tools = llm.bind_tools(TOOLS, parallel_tool_calls=False)
         messages = list(state["messages"])
         if not messages or not isinstance(messages[0], SystemMessage):
             messages = [SystemMessage(content=SYSTEM_PROMPT)] + messages

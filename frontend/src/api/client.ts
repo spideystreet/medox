@@ -96,17 +96,24 @@ export async function streamMessage(
   threadId: string,
   message: string,
   callbacks: StreamCallbacks,
+  apiKey?: string | null,
 ): Promise<void> {
+  const body: Record<string, unknown> = {
+    assistant_id: "nephila_agent",
+    input: {
+      messages: [{ role: "human", content: message }],
+    },
+    stream_mode: ["messages"],
+  };
+
+  if (apiKey) {
+    body.config = { configurable: { api_key: apiKey } };
+  }
+
   const res = await fetch(`${API_BASE}/threads/${threadId}/runs/stream`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      assistant_id: "nephila_agent",
-      input: {
-        messages: [{ role: "human", content: message }],
-      },
-      stream_mode: ["messages"],
-    }),
+    body: JSON.stringify(body),
   });
 
   if (!res.ok) {

@@ -11,6 +11,7 @@ import {
   createThread as apiCreateThread,
   type Message,
 } from "../api/client";
+import { getApiKey } from "../api/keys";
 
 interface ChatViewProps {
   threadId: string | null;
@@ -112,7 +113,7 @@ export function ChatView({ threadId, onThreadCreated, onMenuClick }: ChatViewPro
           setOptimisticMessages([]);
           setErrorMessage("Connection error. Please try again.");
         },
-      });
+      }, getApiKey());
     };
 
     await doStream(currentThreadId);

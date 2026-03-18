@@ -1,4 +1,11 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, type Page } from "@playwright/test";
+
+/** Set a fake API key so /chat doesn't redirect to /setup. */
+async function setFakeApiKey(page: Page) {
+  await page.addInitScript(() => {
+    localStorage.setItem("nephila:apiKey", "sk-or-test-key-for-e2e");
+  });
+}
 
 test.describe("Nephila Landing Page", () => {
   test("shows landing page at /", async ({ page }) => {
@@ -12,17 +19,48 @@ test.describe("Nephila Landing Page", () => {
     await expect(page.getByText("Mistral AI")).toBeVisible();
   });
 
-  test("enter button navigates to /chat", async ({ page }) => {
+  test("enter button navigates to /setup without API key", async ({ page }) => {
+    await page.goto("/");
+    await page.getByTestId("enter-app-btn").click();
+    await expect(page).toHaveURL(/\/setup/);
+    await expect(page.getByTestId("api-key-input")).toBeVisible();
+  });
+
+  test("enter button navigates to /chat with API key", async ({ page }) => {
+    await setFakeApiKey(page);
     await page.goto("/");
     await page.getByTestId("enter-app-btn").click();
     await expect(page).toHaveURL(/\/chat/);
     await expect(page.getByTestId("app")).toBeVisible();
-    await expect(page.getByTestId("welcome-screen")).toBeVisible();
+  });
+});
+
+test.describe("Nephila Setup", () => {
+  test("shows setup screen at /setup", async ({ page }) => {
+    await page.goto("/setup");
+    await expect(page.getByTestId("api-key-input")).toBeVisible();
+    await expect(page.getByTestId("save-key-btn")).toBeVisible();
+    await expect(page.getByRole("link", { name: "OpenRouter" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Mistral AI" })).toBeVisible();
+  });
+
+  test("validates empty key", async ({ page }) => {
+    await page.goto("/setup");
+    await page.getByTestId("save-key-btn").click();
+    await expect(page.getByText("API key is required")).toBeVisible();
+  });
+
+  test("saves key and navigates to /chat", async ({ page }) => {
+    await page.goto("/setup");
+    await page.getByTestId("api-key-input").fill("sk-or-test-key-12345678");
+    await page.getByTestId("save-key-btn").click();
+    await expect(page).toHaveURL(/\/chat/);
   });
 });
 
 test.describe("Nephila App", () => {
   test.beforeEach(async ({ page }) => {
+    await setFakeApiKey(page);
     await page.goto("/chat");
   });
 
@@ -79,6 +117,7 @@ test.describe("Nephila App", () => {
 
 test.describe("Nephila Sidebar", () => {
   test.beforeEach(async ({ page }) => {
+    await setFakeApiKey(page);
     await page.goto("/chat");
   });
 
@@ -155,6 +194,7 @@ test.describe("Nephila Sidebar", () => {
 
 test.describe("Nephila Chat Messages", () => {
   test("sends a message and displays it", async ({ page }) => {
+    await setFakeApiKey(page);
     await page.route("**/api/threads", async (route) => {
       if (route.request().method() === "POST") {
         const url = route.request().url();
@@ -226,6 +266,7 @@ test.describe("Nephila Chat Messages", () => {
   test("displays warning banner for critical interactions", async ({
     page,
   }) => {
+    await setFakeApiKey(page);
     await page.route("**/api/threads/search", async (route) => {
       await route.fulfill({
         status: 200,
@@ -295,6 +336,7 @@ test.describe("Nephila Mobile", () => {
   test.use({ viewport: { width: 375, height: 812 } });
 
   test("sidebar is hidden on mobile by default @mobile", async ({ page }) => {
+    await setFakeApiKey(page);
     await page.goto("/chat");
     const sidebar = page.getByTestId("sidebar");
     await expect(sidebar).toHaveCSS("transform", /matrix/);
@@ -305,6 +347,7 @@ test.describe("Nephila Mobile", () => {
   });
 
   test("hamburger menu opens sidebar on mobile @mobile", async ({ page }) => {
+    await setFakeApiKey(page);
     await page.goto("/chat");
     await page.getByTestId("menu-btn").click();
     await expect(page.getByTestId("sidebar-overlay")).toBeVisible();
