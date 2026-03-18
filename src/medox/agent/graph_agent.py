@@ -6,9 +6,10 @@ Architecture: agent (LLM + tools) → guardrail → response|warn
 import threading
 from typing import Any
 
-from langchain_core.messages import SystemMessage
+from langchain_core.messages import AIMessage, SystemMessage
 from langchain_core.runnables import RunnableConfig
 from langchain_openai import ChatOpenAI
+from openai import AuthenticationError, PermissionDeniedError
 from langgraph.graph import END, START, StateGraph
 from langgraph.graph.state import CompiledStateGraph
 from langgraph.prebuilt import ToolNode
@@ -75,12 +76,27 @@ def routing(state: AgentState) -> str:
 
 def build_agent() -> CompiledStateGraph:  # type: ignore[type-arg]
     def agent_node(state: AgentState, config: RunnableConfig) -> dict[str, Any]:
-        llm = _get_llm(config)
+        try:
+            llm = _get_llm(config)
+        except ValueError as exc:
+            return {"messages": [AIMessage(content=f"Configuration error: {exc}")]}
+
         llm_with_tools = llm.bind_tools(TOOLS, parallel_tool_calls=False)
         messages = list(state["messages"])
         if not messages or not isinstance(messages[0], SystemMessage):
             messages = [SystemMessage(content=SYSTEM_PROMPT)] + messages
-        return {"messages": [llm_with_tools.invoke(messages)]}
+
+        try:
+            return {"messages": [llm_with_tools.invoke(messages)]}
+        except (AuthenticationError, PermissionDeniedError):
+            return {
+                "messages": [
+                    AIMessage(
+                        content="Invalid API key. Please check your key in settings "
+                        "and make sure it's a valid OpenRouter or Mistral API key."
+                    )
+                ]
+            }
 
     builder = StateGraph(AgentState)
     builder.add_node("agent", agent_node)
