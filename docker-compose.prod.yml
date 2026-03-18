@@ -1,9 +1,7 @@
 services:
   # Reverse proxy — auto HTTPS via Let's Encrypt
   caddy:
-    build:
-      context: .
-      dockerfile: deploy/Dockerfile.caddy
+    image: caddy:2-alpine
     restart: unless-stopped
     ports:
       - "80:80"
