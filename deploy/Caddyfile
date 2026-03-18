@@ -1,18 +1,4 @@
 {$DOMAIN:medoxai.com} {
-	# Frontend — static React app
-	handle / {
-		reverse_proxy frontend:3000
-	}
-	handle /chat* {
-		reverse_proxy frontend:3000
-	}
-	handle /setup* {
-		reverse_proxy frontend:3000
-	}
-	handle /assets/* {
-		reverse_proxy frontend:3000
-	}
-
 	# Backend API — proxy to LangGraph server
 	handle /api/* {
 		uri strip_prefix /api
@@ -22,5 +8,10 @@
 	# Health check
 	handle /health {
 		reverse_proxy backend:2024
+	}
+
+	# Frontend — everything else goes to the React SPA
+	handle {
+		reverse_proxy frontend:3000
 	}
 }
