@@ -239,3 +239,4 @@ chroma/
 
 # Medox — Custom CA bundle (built locally, not versioned)
 certs/ca-bundle.pem
+*.png
