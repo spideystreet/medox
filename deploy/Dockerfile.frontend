@@ -1,0 +1,21 @@
+FROM node:20-alpine AS build
+
+WORKDIR /app
+
+COPY frontend/package.json frontend/package-lock.json ./
+RUN npm ci
+
+COPY frontend/ .
+
+# Build with backend API URL injected
+RUN npm run build
+
+FROM caddy:2-alpine
+
+# Copy built frontend
+COPY --from=build /app/dist /srv
+
+# Copy Caddyfile for frontend serving
+COPY deploy/Caddyfile.frontend /etc/caddy/Caddyfile
+
+EXPOSE 3000
