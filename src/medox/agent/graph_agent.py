@@ -23,7 +23,6 @@ from medox.agent.tools.tool_check_interactions import check_interactions
 from medox.agent.tools.tool_find_generics import find_generics
 from medox.agent.tools.tool_get_rcp import get_rcp
 from medox.agent.tools.tool_search_drug import search_drug
-from medox.pipeline.config_pipeline import PipelineSettings
 
 TOOLS = [search_drug, find_generics, check_interactions, get_rcp]
 RECURSION_LIMIT = 25
@@ -65,14 +64,7 @@ def _get_llm(config: RunnableConfig) -> ChatOpenAI:
             default_headers={"X-Title": "Medox"},
         )
 
-    # Fallback to env vars
-    settings = PipelineSettings()
-    return ChatOpenAI(
-        base_url=settings.openrouter_base_url,
-        api_key=SecretStr(settings.openrouter_api_key),
-        model=settings.openrouter_model,
-        default_headers={"X-Title": "Medox"},
-    )
+    raise ValueError("No API key provided. Please configure your API key in settings.")
 
 
 def routing(state: AgentState) -> str:

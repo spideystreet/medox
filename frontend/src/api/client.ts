@@ -1,5 +1,14 @@
 const API_BASE = "/api";
 
+function getUserId(): string {
+  let id = localStorage.getItem("medox_user_id");
+  if (!id) {
+    id = crypto.randomUUID();
+    localStorage.setItem("medox_user_id", id);
+  }
+  return id;
+}
+
 export interface Thread {
   thread_id: string;
   metadata: Record<string, unknown>;
@@ -30,7 +39,7 @@ export async function createThread(): Promise<Thread> {
   const res = await fetch(`${API_BASE}/threads`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ metadata: {} }),
+    body: JSON.stringify({ metadata: { user_id: getUserId() } }),
   });
   if (!res.ok) throw new Error(`Failed to create thread: ${res.status}`);
   return res.json();
@@ -40,7 +49,7 @@ export async function listThreads(): Promise<Thread[]> {
   const res = await fetch(`${API_BASE}/threads/search`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ limit: 50 }),
+    body: JSON.stringify({ metadata: { user_id: getUserId() }, limit: 50 }),
   });
   if (!res.ok) throw new Error(`Failed to list threads: ${res.status}`);
   return res.json();
@@ -53,7 +62,7 @@ export async function updateThreadMetadata(
   const res = await fetch(`${API_BASE}/threads/${threadId}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ metadata }),
+    body: JSON.stringify({ metadata: { ...metadata, user_id: getUserId() } }),
   });
   if (!res.ok) throw new Error(`Failed to update thread: ${res.status}`);
   return res.json();
