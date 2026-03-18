@@ -1,6 +1,6 @@
 [project]
 name = "medox"
-version = "0.1.0"
+version = "0.2.0"
 description = "Agent LangGraph spécialisé dans les référentiels médicamenteux français"
 requires-python = ">=3.11"
 dependencies = [
