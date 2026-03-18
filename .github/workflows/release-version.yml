@@ -24,10 +24,6 @@ jobs:
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "Bumping to version: $VERSION"
 
-      - name: Update pyproject.toml
-        run: |
-          sed -i "s/^version = \".*\"/version = \"${{ steps.version.outputs.version }}\"/" pyproject.toml
-
       - name: Update frontend package.json
         run: |
           cd frontend
@@ -37,6 +33,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add pyproject.toml frontend/package.json frontend/package-lock.json
-          git diff --cached --quiet || git commit -m "chore: bump version to ${{ steps.version.outputs.version }}"
+          git add frontend/package.json frontend/package-lock.json
+          git diff --cached --quiet || git commit -m "chore: bump frontend version to ${{ steps.version.outputs.version }}"
           git push origin main
