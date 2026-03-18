@@ -146,36 +146,29 @@ export function LandingPage({ onEnter }: LandingPageProps) {
         ))}
       </div>
 
-      {/* Top bar — Mistral (left) + version & GitHub (right) */}
+      {/* Top bar — version & GitHub (right) */}
       <div
-        className={`relative z-10 pt-4 px-6 flex justify-between items-center transition-opacity duration-700 ${showContent ? "opacity-100" : "opacity-0"}`}
+        className={`relative z-10 pt-4 px-6 flex justify-end items-center gap-3 transition-opacity duration-700 ${showContent ? "opacity-100" : "opacity-0"}`}
       >
-        <div className="flex items-center gap-1.5 text-text-muted text-[10px] uppercase tracking-wider">
-          Works better with
-          <img src="/mistral.png" alt="Mistral AI" width="16" height="16" className="image-rendering-pixelated" />
-          <span className="normal-case tracking-normal text-xs opacity-70">Mistral AI</span>
-        </div>
-        <div className="flex items-center gap-3">
-          {version && (
-            <span className="text-[10px] font-mono text-emerald-500 border border-emerald-500/30 bg-emerald-500/5 px-2 py-0.5 rounded">
-              v{version}
+        {version && (
+          <span className="text-[10px] font-mono text-emerald-500 border border-emerald-500/30 bg-emerald-500/5 px-2 py-0.5 rounded">
+            v{version}
+          </span>
+        )}
+        <a
+          href={`https://github.com/${GITHUB_REPO}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-1.5 text-text-muted hover:text-text-primary transition-colors"
+          data-testid="github-link"
+        >
+          <GitHubIcon />
+          {stars != null && (
+            <span className="text-xs">
+              {stars} <span className="text-yellow-500">&#9733;</span>
             </span>
           )}
-          <a
-            href={`https://github.com/${GITHUB_REPO}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-1.5 text-text-muted hover:text-text-primary transition-colors"
-            data-testid="github-link"
-          >
-            <GitHubIcon />
-            {stars != null && (
-              <span className="text-xs">
-                {stars} <span className="text-yellow-500">&#9733;</span>
-              </span>
-            )}
-          </a>
-        </div>
+        </a>
       </div>
 
       {/* Main content */}
@@ -228,6 +221,12 @@ export function LandingPage({ onEnter }: LandingPageProps) {
                   {tag}
                 </span>
               ))}
+            </div>
+
+            <div className="flex items-center justify-center gap-1.5 mt-6 text-text-muted text-[10px] uppercase tracking-wider">
+              Works better with
+              <img src="/mistral.png" alt="Mistral AI" width="16" height="16" className="image-rendering-pixelated" />
+              <span className="normal-case tracking-normal text-xs opacity-70">Mistral AI</span>
             </div>
           </div>
         </div>
