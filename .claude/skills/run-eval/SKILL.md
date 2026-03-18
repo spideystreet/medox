@@ -19,7 +19,7 @@ disable-model-invocation: true
 
 2. **Run the evaluation suite**
    ```bash
-   uv run dotenv -f .env run -- uv run python scripts/run_eval.py
+   uv run dotenv -f .env run -- python scripts/run_eval.py
    ```
    Note the experiment name printed (e.g. `medox-<hash>`).
 

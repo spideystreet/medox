@@ -31,3 +31,5 @@ Bronze (raw files) → Silver (PostgreSQL via dbt) → Gold (ChromaDB embeddings
 | `frontend/e2e/` | Playwright E2E tests |
 | `tests/` | pytest unit + e2e eval (`prompts.yaml`) |
 | `scripts/` | `run_eval.py` — LangSmith evaluation |
+| `deploy/` | Hetzner VPS deployment (Dockerfiles, Caddyfile, scripts) |
+| `.github/workflows/` | CI (lint+test), deploy on release, auto version bump |
