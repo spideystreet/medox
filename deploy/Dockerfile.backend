@@ -13,10 +13,10 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 # Copy dependency files first for caching
 COPY pyproject.toml uv.lock ./
 
-# Install production deps — CPU-only PyTorch, cache mount persists between builds
-ENV UV_EXTRA_INDEX_URL=https://download.pytorch.org/whl/cpu
+# Install production deps — cache mount persists between builds, then swap torch for CPU-only
 RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --frozen --no-dev
+    uv sync --frozen --no-dev \
+    && uv pip install torch --index-url https://download.pytorch.org/whl/cpu --force-reinstall --no-deps
 
 # Download embedding model — before COPY src/ so it stays cached across code changes
 RUN --mount=type=cache,target=/root/.cache/huggingface \
