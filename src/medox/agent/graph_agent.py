@@ -3,7 +3,6 @@ Medox ReAct agent — LangGraph graph definition.
 Architecture: agent (LLM + tools) → guardrail → response|warn
 """
 
-import os
 import threading
 from typing import Any
 
@@ -46,25 +45,24 @@ FORMAT DE RÉPONSE — STRICT :
 
 
 def _get_llm(config: RunnableConfig) -> ChatOpenAI:
-    """Build LLM from user-provided API key (configurable) or env fallback."""
+    """Build LLM from user-provided API key (BYOK only, no server-side fallback)."""
     user_key = (config.get("configurable") or {}).get("api_key")
+    if not user_key:
+        raise ValueError("No API key provided. Configure your key in settings.")
 
-    if user_key:
-        # Detect provider from key prefix
-        if user_key.startswith("sk-or-"):
-            base_url = os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
-            model = os.getenv("OPENROUTER_MODEL", "mistralai/ministral-8b-2512")
-        else:
-            base_url = "https://api.mistral.ai/v1"
-            model = "ministral-8b-latest"
-        return ChatOpenAI(
-            base_url=base_url,
-            api_key=SecretStr(user_key),
-            model=model,
-            default_headers={"X-Title": "Medox"},
-        )
+    if user_key.startswith("sk-or-"):
+        base_url = "https://openrouter.ai/api/v1"
+        model = "mistralai/ministral-8b-2512"
+    else:
+        base_url = "https://api.mistral.ai/v1"
+        model = "ministral-8b-latest"
 
-    raise ValueError("No API key provided. Please configure your API key in settings.")
+    return ChatOpenAI(
+        base_url=base_url,
+        api_key=SecretStr(user_key),
+        model=model,
+        default_headers={"X-Title": "Medox"},
+    )
 
 
 def routing(state: AgentState) -> str:

@@ -1,7 +1,9 @@
 services:
   # Reverse proxy — auto HTTPS via Let's Encrypt
   caddy:
-    image: caddy:2-alpine
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile.caddy
     restart: unless-stopped
     ports:
       - "80:80"
@@ -43,9 +45,6 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       CHROMA_HOST: chromadb
       CHROMA_PORT: "8000"
-      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
-      OPENROUTER_BASE_URL: ${OPENROUTER_BASE_URL}
-      OPENROUTER_MODEL: ${OPENROUTER_MODEL}
     depends_on:
       postgres:
         condition: service_healthy
