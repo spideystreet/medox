@@ -24,7 +24,7 @@ Never use `SettingsConfigDict(env_file=".env")` — `BaseSettings` reads from `o
 |------------|-----------|
 | PostgreSQL | `POSTGRES_HOST`, `POSTGRES_PORT`, `POSTGRES_USER`, `POSTGRES_DB`, `POSTGRES_PASSWORD` |
 | ChromaDB   | `CHROMA_HOST`, `CHROMA_PORT` |
-| LangSmith  | `LANGSMITH_API_KEY`, `LANGSMITH_TRACING=true`, `LANGSMITH_PROJECT=nephila` |
+| LangSmith  | `LANGSMITH_API_KEY`, `LANGSMITH_TRACING=true`, `LANGSMITH_PROJECT=medox` |
 | LLM        | `OPENAI_API_KEY` (or `OPENROUTER_API_KEY` + `OPENROUTER_BASE_URL`) |
 
 See `.env.example` for the full list.

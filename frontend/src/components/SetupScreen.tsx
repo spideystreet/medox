@@ -42,7 +42,7 @@ export function SetupScreen({ onSave }: SetupScreenProps) {
             SETUP
           </h1>
           <p className="text-text-secondary text-sm">
-            Nephila uses your own API key to query LLMs.
+            Medox uses your own API key to query LLMs.
             <br />
             Your key stays in your browser — never stored on our servers.
           </p>
@@ -87,7 +87,7 @@ export function SetupScreen({ onSave }: SetupScreenProps) {
             "
             data-testid="save-key-btn"
           >
-            Start using Nephila
+            Start using Medox
           </button>
         </form>
 

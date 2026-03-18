@@ -1,4 +1,4 @@
-const KEY_STORAGE = "nephila:apiKey";
+const KEY_STORAGE = "medox:apiKey";
 
 export function getApiKey(): string | null {
   try {

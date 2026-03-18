@@ -82,7 +82,7 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
         </button>
       </div>
       <p className="text-center text-[11px] text-text-muted mt-2">
-        Nephila peut faire des erreurs. V&eacute;rifiez les informations
+        Medox peut faire des erreurs. V&eacute;rifiez les informations
         importantes.
       </p>
     </div>

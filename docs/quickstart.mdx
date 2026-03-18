@@ -13,8 +13,8 @@ description: "De zéro à un agent fonctionnel en 5 étapes"
 ## Étape 1 — Cloner et installer
 
 ```bash
-git clone https://github.com/spideystreet/nephila.git
-cd nephila
+git clone https://github.com/spideystreet/medox.git
+cd medox
 
 # Installer les dépendances (prod + dev)
 uv sync && uv sync --extra dev
@@ -34,15 +34,15 @@ OPENROUTER_API_KEY="sk-or-..."
 OPENROUTER_MODEL="anthropic/claude-3-5-sonnet"
 
 # PostgreSQL
-POSTGRES_USER="nephila"
+POSTGRES_USER="medox"
 POSTGRES_PASSWORD="votre-mot-de-passe"
-POSTGRES_DB="nephila"
+POSTGRES_DB="medox"
 
 # Dagster (chemin absolu)
-DAGSTER_HOME="/chemin/absolu/vers/nephila/.dagster"
+DAGSTER_HOME="/chemin/absolu/vers/medox/.dagster"
 
 # SSL — certificats CA pour les sites du gouvernement français
-SSL_CERT_FILE="/chemin/absolu/vers/nephila/certs/ca-bundle.pem"
+SSL_CERT_FILE="/chemin/absolu/vers/medox/certs/ca-bundle.pem"
 ```
 
 <Tip>
@@ -102,7 +102,7 @@ Ou depuis l'interface web : sélectionner tous les assets → **Materialize all*
 Une fois le pipeline complété, lancer l'agent :
 
 ```python
-from nephila.agent.graph_agent import graph
+from medox.agent.graph_agent import graph
 
 result = graph.invoke({
     "messages": [{"role": "user", "content": "Quelles sont les interactions du paracétamol avec la warfarine ?"}]

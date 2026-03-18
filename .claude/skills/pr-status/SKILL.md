@@ -106,4 +106,4 @@ If CI failed, add a **Failure Logs** section after GitHub Actions:
 - Use `git` CLI only for local branch detection
 - Call all tools in parallel to minimize latency
 - Do not modify any files or state — this is a read-only skill
-- Owner and repo are always `spideystreet` / `nephila`
+- Owner and repo are always `spideystreet` / `medox`

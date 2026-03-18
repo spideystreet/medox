@@ -1,6 +1,6 @@
 ---
 name: commit
-description: Create a git commit with Nephila conventions (co-author, conventional type/scope). Invoke manually with /commit — do NOT trigger automatically.
+description: Create a git commit with Medox conventions (co-author, conventional type/scope). Invoke manually with /commit — do NOT trigger automatically.
 disable-model-invocation: true
 argument-hint: "[type(scope): message hint]"
 ---

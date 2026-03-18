@@ -70,7 +70,7 @@ export function Sidebar({
         <div className="p-4 border-b border-surface-border">
           <div className="flex items-center justify-between mb-4">
             <Link to="/" className="font-pixel text-pixel-sm text-accent pixel-glow tracking-wider hover:opacity-80 transition-opacity">
-              NEPHILA
+              MEDOX
             </Link>
             <button
               className="md:hidden text-text-muted hover:text-text-primary"

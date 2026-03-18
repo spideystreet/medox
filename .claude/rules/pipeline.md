@@ -1,6 +1,6 @@
 ---
 paths:
-  - src/nephila/pipeline/**
+  - src/medox/pipeline/**
 ---
 
 # Pipeline — Architecture Context

@@ -140,7 +140,7 @@ export function ChatView({ threadId, onThreadCreated, onMenuClick }: ChatViewPro
           </svg>
         </button>
         <Link to="/" className="font-pixel text-pixel-xs text-text-secondary tracking-wider hover:text-accent transition-colors">
-          NEPHILA
+          MEDOX
         </Link>
       </header>
 

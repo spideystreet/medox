@@ -5,7 +5,7 @@ description: "Machine à états LangGraph ReAct — graphe et état de l'agent"
 
 ## Architecture ReAct
 
-L'agent Nephila est implémenté avec **LangGraph** comme machine à états finie. Il suit le pattern **ReAct** (Reasoning + Acting) : le LLM alterne entre raisonnement et appels d'outils jusqu'à produire une réponse finale.
+L'agent Medox est implémenté avec **LangGraph** comme machine à états finie. Il suit le pattern **ReAct** (Reasoning + Acting) : le LLM alterne entre raisonnement et appels d'outils jusqu'à produire une réponse finale.
 
 ```
 START → [agent] ──► tool_calls? ──► [tools] ──► [agent] (loop)
@@ -59,7 +59,7 @@ L'état est défini dans `agent/model_state.py` (`MessagesState` TypedDict + `ad
 ## Utilisation
 
 ```python
-from nephila.agent.graph_agent import graph
+from medox.agent.graph_agent import graph
 
 # Invoquer l'agent
 result = graph.invoke({

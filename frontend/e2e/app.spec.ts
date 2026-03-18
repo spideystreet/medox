@@ -3,15 +3,15 @@ import { test, expect, type Page } from "@playwright/test";
 /** Set a fake API key so /chat doesn't redirect to /setup. */
 async function setFakeApiKey(page: Page) {
   await page.addInitScript(() => {
-    localStorage.setItem("nephila:apiKey", "sk-or-test-key-for-e2e");
+    localStorage.setItem("medox:apiKey", "sk-or-test-key-for-e2e");
   });
 }
 
-test.describe("Nephila Landing Page", () => {
+test.describe("Medox Landing Page", () => {
   test("shows landing page at /", async ({ page }) => {
     await page.goto("/");
     await expect(page.getByTestId("enter-app-btn")).toBeVisible();
-    await expect(page.getByText("Nephila")).toBeVisible();
+    await expect(page.getByText("Medox")).toBeVisible();
     await expect(
       page.getByText("Assistant pharmaceutique intelligent"),
     ).toBeVisible();
@@ -35,7 +35,7 @@ test.describe("Nephila Landing Page", () => {
   });
 });
 
-test.describe("Nephila Setup", () => {
+test.describe("Medox Setup", () => {
   test("shows setup screen at /setup", async ({ page }) => {
     await page.goto("/setup");
     await expect(page.getByTestId("api-key-input")).toBeVisible();
@@ -58,7 +58,7 @@ test.describe("Nephila Setup", () => {
   });
 });
 
-test.describe("Nephila App", () => {
+test.describe("Medox App", () => {
   test.beforeEach(async ({ page }) => {
     await setFakeApiKey(page);
     await page.goto("/chat");
@@ -68,14 +68,14 @@ test.describe("Nephila App", () => {
     await expect(page.getByTestId("app")).toBeVisible();
     await expect(page.getByTestId("welcome-screen")).toBeVisible();
     await expect(
-      page.getByTestId("welcome-screen").getByText("Nephila"),
+      page.getByTestId("welcome-screen").getByText("Medox"),
     ).toBeVisible();
     await expect(
       page.getByText("Assistant pharmaceutique"),
     ).toBeVisible();
   });
 
-  test("displays sidebar with NEPHILA branding", async ({ page }) => {
+  test("displays sidebar with MEDOX branding", async ({ page }) => {
     await expect(page.getByTestId("sidebar")).toBeVisible();
     await expect(page.getByTestId("new-chat-btn")).toBeVisible();
     await expect(page.getByText("v0.1.0")).toBeVisible();
@@ -110,12 +110,12 @@ test.describe("Nephila App", () => {
 
   test("disclaimer text is visible", async ({ page }) => {
     await expect(
-      page.getByText("Nephila peut faire des erreurs"),
+      page.getByText("Medox peut faire des erreurs"),
     ).toBeVisible();
   });
 });
 
-test.describe("Nephila Sidebar", () => {
+test.describe("Medox Sidebar", () => {
   test.beforeEach(async ({ page }) => {
     await setFakeApiKey(page);
     await page.goto("/chat");
@@ -192,7 +192,7 @@ test.describe("Nephila Sidebar", () => {
   });
 });
 
-test.describe("Nephila Chat Messages", () => {
+test.describe("Medox Chat Messages", () => {
   test("sends a message and displays it", async ({ page }) => {
     await setFakeApiKey(page);
     await page.route("**/api/threads", async (route) => {
@@ -222,7 +222,7 @@ test.describe("Nephila Chat Messages", () => {
     await page.route("**/api/threads/*/runs/stream", async (route) => {
       const body = [
         'event: metadata\ndata: {"run_id": "r1"}\n\n',
-        'event: messages/partial\ndata: [{"content": "Test response from Nephila", "type": "ai", "id": "a1"}]\n\n',
+        'event: messages/partial\ndata: [{"content": "Test response from Medox", "type": "ai", "id": "a1"}]\n\n',
         "event: end\ndata: null\n\n",
       ].join("");
 
@@ -243,7 +243,7 @@ test.describe("Nephila Chat Messages", () => {
               { type: "human", content: "Test question", id: "msg-1" },
               {
                 type: "ai",
-                content: "Test response from Nephila",
+                content: "Test response from Medox",
                 id: "msg-2",
               },
             ],
@@ -332,7 +332,7 @@ test.describe("Nephila Chat Messages", () => {
   });
 });
 
-test.describe("Nephila Mobile", () => {
+test.describe("Medox Mobile", () => {
   test.use({ viewport: { width: 375, height: 812 } });
 
   test("sidebar is hidden on mobile by default @mobile", async ({ page }) => {

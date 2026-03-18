@@ -43,7 +43,7 @@ export function WelcomeScreen({ onSuggestionClick }: WelcomeScreenProps) {
         </div>
 
         <h1 className="font-pixel text-pixel-lg text-accent pixel-glow">
-          Nephila
+          Medox
         </h1>
         <p className="text-text-secondary text-sm">
           Assistant pharmaceutique &mdash; BDPM &amp; ANSM

@@ -1,6 +1,6 @@
 """Unit tests for _normalize and _substance_matches_query helpers."""
 
-from nephila.agent.tools.tool_check_interactions import (
+from medox.agent.tools.tool_check_interactions import (
     _normalize,
     _substance_matches_query,
 )

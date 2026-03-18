@@ -1,7 +1,7 @@
 """Verify CRITICAL_LEVELS is a single source of truth across nodes."""
 
-from nephila.agent.model_state import CRITICAL_LEVELS
-from nephila.agent.nodes import node_guardrail, node_warn
+from medox.agent.model_state import CRITICAL_LEVELS
+from medox.agent.nodes import node_guardrail, node_warn
 
 
 class TestCriticalLevelsSingleSource:

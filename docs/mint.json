@@ -1,5 +1,5 @@
 {
-  "name": "Nephila",
+  "name": "Medox",
   "favicon": "/favicon.png",
   "colors": {
     "primary": "#0ea5e9",
@@ -9,7 +9,7 @@
   "topbarLinks": [
     {
       "name": "GitHub",
-      "url": "https://github.com/spideystreet/nephila"
+      "url": "https://github.com/spideystreet/medox"
     }
   ],
   "navigation": [
@@ -47,6 +47,6 @@
     }
   ],
   "footerSocials": {
-    "github": "https://github.com/spideystreet/nephila"
+    "github": "https://github.com/spideystreet/medox"
   }
 }

@@ -14,8 +14,8 @@ description: "Setup complet — uv, Docker, variables d'environnement, certifica
 
 ```bash
 # Cloner le dépôt
-git clone https://github.com/spideystreet/nephila.git
-cd nephila
+git clone https://github.com/spideystreet/medox.git
+cd medox
 
 # Installer toutes les dépendances (prod + dev)
 uv sync && uv sync --extra dev
@@ -65,7 +65,7 @@ cp .env.example .env
 
 | Variable | Obligatoire | Description |
 |----------|------------|-------------|
-| `DAGSTER_HOME` | Oui | **Chemin absolu** vers le répertoire Dagster (ex: `/home/user/nephila/.dagster`) |
+| `DAGSTER_HOME` | Oui | **Chemin absolu** vers le répertoire Dagster (ex: `/home/user/medox/.dagster`) |
 
 #### SSL — Certificats CA gouvernementaux français
 
@@ -87,7 +87,7 @@ bash scripts/build_ca_bundle.sh
 |----------|------------|-------------|
 | `LANGCHAIN_TRACING_V2` | Non | Activer le tracing LangSmith (`true`/`false`) |
 | `LANGCHAIN_API_KEY` | Non | Clé API LangSmith |
-| `LANGCHAIN_PROJECT` | Non | Nom du projet LangSmith (défaut: `nephila`) |
+| `LANGCHAIN_PROJECT` | Non | Nom du projet LangSmith (défaut: `medox`) |
 
 ## Services Docker
 

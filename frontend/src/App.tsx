@@ -6,7 +6,7 @@ import { LandingPage } from "./components/LandingPage";
 import { SetupScreen } from "./components/SetupScreen";
 import { getApiKey, setApiKey } from "./api/keys";
 
-const STORAGE_KEY = "nephila:activeThread";
+const STORAGE_KEY = "medox:activeThread";
 
 function getStoredThreadId(): string | null {
   try {

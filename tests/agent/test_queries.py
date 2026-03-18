@@ -1,12 +1,12 @@
-"""Unit and integration tests for nephila.agent.queries."""
+"""Unit and integration tests for medox.agent.queries."""
 
 from unittest.mock import MagicMock, patch
 
 import pytest
 
-from nephila.agent import queries
-from nephila.models.model_ansm import InteractionRow
-from nephila.models.model_queries import GeneriqueResult, RcpRow
+from medox.agent import queries
+from medox.models.model_ansm import InteractionRow
+from medox.models.model_queries import GeneriqueResult, RcpRow
 
 
 class TestGetEngine:
@@ -15,8 +15,8 @@ class TestGetEngine:
         queries._engine = None
         mock_engine = MagicMock()
         with (
-            patch("nephila.agent.queries.PipelineSettings"),
-            patch("nephila.agent.queries.create_engine", return_value=mock_engine),
+            patch("medox.agent.queries.PipelineSettings"),
+            patch("medox.agent.queries.create_engine", return_value=mock_engine),
         ):
             try:
                 e1 = queries._get_engine()

@@ -2,7 +2,7 @@
 
 from langchain_core.messages import HumanMessage, ToolMessage
 
-from nephila.agent.nodes.node_guardrail import guardrail_node, should_warn
+from medox.agent.nodes.node_guardrail import guardrail_node, should_warn
 
 
 def _state(messages: list) -> dict:

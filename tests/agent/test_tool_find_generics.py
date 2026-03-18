@@ -2,7 +2,7 @@
 
 import pytest
 
-from nephila.agent.tools.tool_find_generics import find_generics
+from medox.agent.tools.tool_find_generics import find_generics
 
 
 class TestFindGenericsCisValidation:

@@ -1,7 +1,7 @@
 <div align="center">
-  <img src="docs/favicon.png" alt="Logo Nephila" width="200" />
+  <img src="docs/favicon.png" alt="Logo Medox" width="200" />
 
-  # Nephila
+  # Medox
 
   <p>
     <img src="https://img.shields.io/badge/status-experimental-orange.svg" alt="Status Experimental">
@@ -12,10 +12,10 @@
   </p>
 </div>
 
-**Nephila** is a fast ReAct AI agent built to query official French pharmaceutical databases.
+**Medox** is a fast ReAct AI agent built to query official French pharmaceutical databases.
 
 > [!NOTE]
-> **Disclaimer:** Nephila is an experimental information tool based on official data — ANSM, BDPM. It does not replace professional medical advice.
+> **Disclaimer:** Medox is an experimental information tool based on official data — ANSM, BDPM. It does not replace professional medical advice.
 
 ## Features
 * 🔍 **Instant drug search** across brand names and generics
@@ -42,12 +42,12 @@ uv run dotenv -f .env run -- uv run langgraph dev   # Studio at localhost:2024
 
 ## Repository structure
 ```text
-nephila/
+medox/
 ├── data/                # Local files — Bronze layer
 ├── dbt/                 # SQL models & transforms — Silver layer
 ├── docs/                # Mintlify documentation
 ├── scripts/             # Utility scripts — run_eval.py
-├── src/nephila/         # Main source code
+├── src/medox/         # Main source code
 │   ├── agent/           # LangGraph ReAct agent
 │   │   ├── nodes/       # Graph nodes — guardrail, response, warn
 │   │   ├── tools/       # LangChain tools — search, interactions, generics, RCP

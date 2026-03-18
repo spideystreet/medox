@@ -5,7 +5,7 @@ description: Researches drug interactions from ANSM/data.gouv.fr sources. Use wh
 
 # Agent: ansm-researcher
 
-Research agent for ANSM drug interaction data — bridges data.gouv.fr and the Nephila test suite.
+Research agent for ANSM drug interaction data — bridges data.gouv.fr and the Medox test suite.
 
 ## Trigger
 

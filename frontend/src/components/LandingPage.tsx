@@ -8,7 +8,7 @@ function GlitchTitle() {
   const [text, setText] = useState("");
   const [showCursor, setShowCursor] = useState(true);
   const [glitching, setGlitching] = useState(false);
-  const fullText = "Nephila";
+  const fullText = "Medox";
 
   useEffect(() => {
     let i = 0;

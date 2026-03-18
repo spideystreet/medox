@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from nephila.pipeline.io.parser_ansm import (
+from medox.pipeline.io.parser_ansm import (
     _CLASS_MEMBERS_RE,
     _VOIR_AUSSI_RE,
     _detect_constraint,

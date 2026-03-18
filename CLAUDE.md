@@ -1,4 +1,4 @@
-# Nephila
+# Medox
 
 Medical drug interaction assistant for French Healthcare professionals. 
 LangGraph ReAct agent over BDPM + ANSM data.
@@ -22,8 +22,8 @@ Bronze (raw files) → Silver (PostgreSQL via dbt) → Gold (ChromaDB embeddings
 
 | Path | Role |
 |------|------|
-| `src/nephila/agent/` | LangGraph agent, nodes, tools |
-| `src/nephila/pipeline/` | Dagster assets, loaders, parsers |
+| `src/medox/agent/` | LangGraph agent, nodes, tools |
+| `src/medox/pipeline/` | Dagster assets, loaders, parsers |
 | `dbt/` | dbt Silver models + contracts |
 | `frontend/` | React app (Vite + Tailwind + Playwright E2E) |
 | `frontend/src/api/` | LangGraph API client + TanStack Query hooks |

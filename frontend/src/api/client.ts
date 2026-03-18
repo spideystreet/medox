@@ -99,7 +99,7 @@ export async function streamMessage(
   apiKey?: string | null,
 ): Promise<void> {
   const body: Record<string, unknown> = {
-    assistant_id: "nephila_agent",
+    assistant_id: "medox_agent",
     input: {
       messages: [{ role: "human", content: message }],
     },

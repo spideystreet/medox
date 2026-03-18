@@ -56,7 +56,7 @@ export function ChatMessage({ role, content, isStreaming }: ChatMessageProps) {
           </div>
         )}
 
-        <div className="prose-nephila text-sm text-text-primary leading-relaxed">
+        <div className="prose-medox text-sm text-text-primary leading-relaxed">
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
             components={{

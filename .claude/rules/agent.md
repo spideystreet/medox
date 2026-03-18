@@ -1,6 +1,6 @@
 ---
 paths:
-  - src/nephila/agent/**
+  - src/medox/agent/**
   - tests/agent/**
 ---
 

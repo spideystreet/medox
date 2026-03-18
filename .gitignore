@@ -204,38 +204,38 @@ marimo/_static/
 marimo/_lsp/
 __marimo__/
 
-# Nephila — LangGraph Studio
+# Medox — LangGraph Studio
 .langgraph_api/
 
-# Nephila — Claude local overrides
+# Medox — Claude local overrides
 CLAUDE.local.md
 .mcp.json
 .claude/settings.local.json
 .claude/temp/
 .claude/progress/
 
-# Nephila — Other AI assistant configs (machine-specific)
+# Medox — Other AI assistant configs (machine-specific)
 AGENTS.md
 GEMINI.md
 
-# Nephila — LangSmith eval exports
-nephila-*.csv
+# Medox — LangSmith eval exports
+medox-*.csv
 
-# Nephila — Data (raw & processed files)
+# Medox — Data (raw & processed files)
 data/bronze/
 data/silver/
 data/gold/
 
-# Nephila — dbt
+# Medox — dbt
 dbt/target/
 dbt/logs/
 dbt/.user.yml
 
-# Nephila — Dagster
+# Medox — Dagster
 .dagster/
 
-# Nephila — ChromaDB
+# Medox — ChromaDB
 chroma/
 
-# Nephila — Custom CA bundle (built locally, not versioned)
+# Medox — Custom CA bundle (built locally, not versioned)
 certs/ca-bundle.pem

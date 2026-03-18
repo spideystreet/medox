@@ -1,5 +1,5 @@
 """
-Nephila — LangSmith evaluation script.
+Medox — LangSmith evaluation script.
 
 Loads test cases from tests/e2e/prompts.yaml, syncs them to a LangSmith dataset,
 runs the agent against each case, and publishes scored results to LangSmith.
@@ -23,7 +23,7 @@ from langsmith.evaluation import evaluate
 load_dotenv()
 
 PROMPTS_FILE = Path(__file__).parent.parent / "tests" / "e2e" / "prompts.yaml"
-DATASET_NAME = "nephila-interaction-tests"
+DATASET_NAME = "medox-interaction-tests"
 
 CRITICAL_LEVELS = {"contre-indication", "association déconseillée"}
 
@@ -38,7 +38,7 @@ def _sync_dataset(client: Client, cases: list[dict]) -> None:
     else:
         dataset = client.create_dataset(
             DATASET_NAME,
-            description="Nephila agent interaction test cases (tests/e2e/prompts.yaml)",
+            description="Medox agent interaction test cases (tests/e2e/prompts.yaml)",
         )
 
     client.create_examples(
@@ -65,7 +65,7 @@ def _verify_data(cases: list[dict]) -> bool:
     Compares the real DB constraint level with the test's expect_warn flag.
     Returns True if all cases are consistent, False if mismatches found.
     """
-    from nephila.agent.tools.tool_check_interactions import check_interactions
+    from medox.agent.tools.tool_check_interactions import check_interactions
 
     interaction_cases = [c for c in cases if c.get("substance_a") and c.get("substance_b")]
     if not interaction_cases:
@@ -178,7 +178,7 @@ def interaction_evaluator(
 
 
 def main() -> None:
-    from nephila.agent.graph_agent import RECURSION_LIMIT, build_agent
+    from medox.agent.graph_agent import RECURSION_LIMIT, build_agent
 
     cases: list[dict] = yaml.safe_load(PROMPTS_FILE.read_text())
     client = Client()
@@ -203,7 +203,7 @@ def main() -> None:
         target,
         data=DATASET_NAME,
         evaluators=[interaction_evaluator],
-        experiment_prefix="nephila",
+        experiment_prefix="medox",
         max_concurrency=1,
     )
 
