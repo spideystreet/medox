@@ -4,6 +4,7 @@ import { Sidebar } from "./components/Sidebar";
 import { ChatView } from "./components/ChatView";
 import { LandingPage } from "./components/LandingPage";
 import { SetupScreen } from "./components/SetupScreen";
+import { NotFoundPage } from "./components/NotFoundPage";
 import { getApiKey, setApiKey } from "./api/keys";
 
 const STORAGE_KEY = "medox:activeThread";
@@ -131,6 +132,7 @@ export function App() {
           </RequireKey>
         }
       />
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
 }
