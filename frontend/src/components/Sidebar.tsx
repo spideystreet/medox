@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { useThreads, useCreateThread, useDeleteThread } from "../api/hooks";
 import type { Thread } from "../api/client";
 
@@ -68,9 +69,9 @@ export function Sidebar({
       >
         <div className="p-4 border-b border-surface-border">
           <div className="flex items-center justify-between mb-4">
-            <h1 className="font-pixel text-pixel-sm text-accent pixel-glow tracking-wider">
+            <Link to="/" className="font-pixel text-pixel-sm text-accent pixel-glow tracking-wider hover:opacity-80 transition-opacity">
               NEPHILA
-            </h1>
+            </Link>
             <button
               className="md:hidden text-text-muted hover:text-text-primary"
               onClick={onClose}

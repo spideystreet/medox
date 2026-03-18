@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
+import { Link } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { ChatMessage } from "./ChatMessage";
 import { ChatInput } from "./ChatInput";
@@ -137,9 +138,9 @@ export function ChatView({ threadId, onThreadCreated, onMenuClick }: ChatViewPro
             />
           </svg>
         </button>
-        <h2 className="font-pixel text-pixel-xs text-text-secondary tracking-wider">
+        <Link to="/" className="font-pixel text-pixel-xs text-text-secondary tracking-wider hover:text-accent transition-colors">
           NEPHILA
-        </h2>
+        </Link>
       </header>
 
       {!hasMessages ? (

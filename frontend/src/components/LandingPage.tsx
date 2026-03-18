@@ -164,7 +164,7 @@ export function LandingPage({ onEnter }: LandingPageProps) {
         className={`relative z-10 pb-6 flex flex-col items-center gap-1.5 transition-opacity duration-700 ${showContent ? "opacity-100" : "opacity-0"}`}
       >
         <span className="text-[10px] uppercase tracking-[0.2em] text-text-muted">
-          Powered by
+          Works better with
         </span>
         <div className="flex items-center gap-2.5">
           <img src="/mistral.png" alt="Mistral AI" width="20" height="20" className="image-rendering-pixelated" />

@@ -8,7 +8,7 @@ test.describe("Nephila Landing Page", () => {
     await expect(
       page.getByText("Assistant pharmaceutique intelligent"),
     ).toBeVisible();
-    await expect(page.getByText("Powered by")).toBeVisible();
+    await expect(page.getByText("Works better with")).toBeVisible();
     await expect(page.getByText("Mistral AI")).toBeVisible();
   });
 
