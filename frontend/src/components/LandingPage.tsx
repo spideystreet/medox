@@ -146,7 +146,7 @@ export function LandingPage({ onEnter }: LandingPageProps) {
         ))}
       </div>
 
-      {/* Top bar — version + GitHub stars */}
+      {/* Top bar — version + Mistral + GitHub stars */}
       <div
         className={`relative z-10 pt-4 px-6 flex justify-between items-center transition-opacity duration-700 ${showContent ? "opacity-100" : "opacity-0"}`}
       >
@@ -155,6 +155,11 @@ export function LandingPage({ onEnter }: LandingPageProps) {
             v{version}
           </span>
         )}
+        <div className="flex items-center gap-1.5 text-text-muted text-[10px] uppercase tracking-wider">
+          Works better with
+          <img src="/mistral.png" alt="Mistral AI" width="16" height="16" className="image-rendering-pixelated" />
+          <span className="normal-case tracking-normal text-xs opacity-70">Mistral AI</span>
+        </div>
         <a
           href={`https://github.com/${GITHUB_REPO}`}
           target="_blank"
@@ -228,22 +233,8 @@ export function LandingPage({ onEnter }: LandingPageProps) {
 
       {/* Footer */}
       <div
-        className={`relative z-10 pb-5 flex flex-col items-center gap-3 transition-opacity duration-700 ${showContent ? "opacity-100" : "opacity-0"}`}
+        className={`relative z-10 pb-5 flex items-center justify-center transition-opacity duration-700 ${showContent ? "opacity-100" : "opacity-0"}`}
       >
-        {/* Works better with Mistral */}
-        <div className="flex flex-col items-center gap-1.5">
-          <span className="text-[10px] uppercase tracking-[0.2em] text-text-muted">
-            Works better with
-          </span>
-          <div className="flex items-center gap-2.5">
-            <img src="/mistral.png" alt="Mistral AI" width="20" height="20" className="image-rendering-pixelated" />
-            <span className="text-xs text-text-muted opacity-70 tracking-wide">
-              Mistral AI
-            </span>
-          </div>
-        </div>
-
-        {/* Made by */}
         <p className="text-[11px] text-text-muted">
           with &#10084;&#65039; by{" "}
           <a
