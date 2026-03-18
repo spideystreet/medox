@@ -18,12 +18,13 @@ RUN uv sync --frozen --no-dev \
     && uv pip install --reinstall torch --index-url https://download.pytorch.org/whl/cpu \
     && rm -rf /root/.cache
 
-# Copy source code
+# Download embedding model — before COPY src/ so it stays cached across code changes
+RUN uv run python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('intfloat/multilingual-e5-base')"
+
+# Copy source code (only this layer rebuilds on code changes)
 COPY src/ src/
 COPY langgraph.json .
-
-# Download embedding model at build time so it's cached in the image
-RUN uv run python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('intfloat/multilingual-e5-base')"
+RUN uv sync --frozen --no-dev
 
 EXPOSE 2024
 
