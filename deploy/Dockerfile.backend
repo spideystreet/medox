@@ -13,18 +13,22 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 # Copy dependency files first for caching
 COPY pyproject.toml uv.lock ./
 
-# Install production deps — force CPU-only PyTorch from the start to avoid downloading 5GB of CUDA libs
+# Install production deps — CPU-only PyTorch, cache mount persists between builds
 ENV UV_EXTRA_INDEX_URL=https://download.pytorch.org/whl/cpu
-RUN uv sync --frozen --no-dev \
-    && rm -rf /root/.cache
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --no-dev
 
 # Download embedding model — before COPY src/ so it stays cached across code changes
-RUN uv run python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('intfloat/multilingual-e5-base')"
+RUN --mount=type=cache,target=/root/.cache/huggingface \
+    uv run python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('intfloat/multilingual-e5-base')"
 
 # Copy source code (only this layer rebuilds on code changes)
 COPY src/ src/
 COPY langgraph.json .
-RUN uv sync --frozen --no-dev
+
+# Re-link local package without re-resolving deps
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv pip install --no-deps -e .
 
 EXPOSE 2024
 
