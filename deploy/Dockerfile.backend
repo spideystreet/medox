@@ -13,8 +13,10 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 # Copy dependency files first for caching
 COPY pyproject.toml uv.lock ./
 
-# Install production deps only (no dev extras)
-RUN uv sync --frozen --no-dev
+# Install production deps (CPU-only PyTorch to save ~5GB disk)
+RUN uv sync --frozen --no-dev \
+    && uv pip install --reinstall torch --index-url https://download.pytorch.org/whl/cpu \
+    && rm -rf /root/.cache
 
 # Copy source code
 COPY src/ src/
