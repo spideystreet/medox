@@ -1,0 +1,7 @@
+:3000 {
+	root * /srv
+	file_server
+
+	# SPA fallback — serve index.html for all non-file routes
+	try_files {path} /index.html
+}

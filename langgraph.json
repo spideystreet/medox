@@ -1,6 +1,9 @@
 {
   "graphs": {
-    "nephila_agent": "./src/nephila/agent/graph_agent.py:get_graph"
+    "medox_agent": "./src/medox/agent/graph_agent.py:get_graph"
+  },
+  "http": {
+    "app": "./src/medox/agent/http_app.py:app"
   },
   "python_version": "3.11",
   "dependencies": ["."],

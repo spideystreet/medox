@@ -1,11 +1,11 @@
 ---
 name: eval-runner
-description: Runs LangSmith evaluations and reports results. Use when launching evals, checking which test cases pass/fail, or comparing experiment runs. Knows the nephila-interaction-tests dataset and prompts.yaml structure.
+description: Runs LangSmith evaluations and reports results. Use when launching evals, checking which test cases pass/fail, or comparing experiment runs. Knows the medox-interaction-tests dataset and prompts.yaml structure.
 ---
 
 # Agent: eval-runner
 
-Specialized subagent for running and analyzing LangSmith evaluations on the Nephila agent.
+Specialized subagent for running and analyzing LangSmith evaluations on the Medox agent.
 
 ## Trigger
 
@@ -19,7 +19,7 @@ Use this agent when:
 
 - **Eval script**: `scripts/run_eval.py`
 - **Test cases**: `tests/e2e/prompts.yaml`
-- **LangSmith dataset**: `nephila-interaction-tests`
+- **LangSmith dataset**: `medox-interaction-tests`
 - **Evaluator**: `interaction_evaluator` — scores on `expect_warn`, `expect_in`, `expect_not`
 - **Run command**: `uv run dotenv -f .env run -- python scripts/run_eval.py`
 
@@ -45,7 +45,7 @@ Use this agent when:
 ## Output format
 
 ```
-Eval run: nephila-<timestamp>
+Eval run: medox-<timestamp>
 Cases: 5 total — 4 passed, 1 failed
 
 FAILED: ciclosporine_simvastatine

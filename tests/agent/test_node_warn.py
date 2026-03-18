@@ -2,7 +2,7 @@
 
 from langchain_core.messages import AIMessage, HumanMessage
 
-from nephila.agent.nodes.node_warn import warn_node
+from medox.agent.nodes.node_warn import warn_node
 
 
 def _state(messages: list, interactions: list) -> dict:

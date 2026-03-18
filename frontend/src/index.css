@@ -1,0 +1,183 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #262626 transparent;
+  }
+
+  ::selection {
+    background-color: rgba(255, 255, 255, 0.15);
+  }
+
+  body {
+    overflow: hidden;
+  }
+}
+
+@layer components {
+  .pixel-border {
+    border: 2px solid #262626;
+    image-rendering: pixelated;
+  }
+
+  .pixel-shadow {
+    box-shadow:
+      4px 4px 0px #000000,
+      2px 2px 0px #1a1a1a;
+  }
+
+  .pixel-glow {
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+  }
+}
+
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-out both;
+  }
+
+  .animate-fade-in-up {
+    animation: fadeInUp 0.4s ease-out both;
+  }
+
+  .animate-slide-in-left {
+    animation: slideInLeft 0.25s ease-out both;
+  }
+
+  .animate-slide-in-right {
+    animation: slideInRight 0.3s ease-out both;
+  }
+
+  .animate-scale-in {
+    animation: scaleIn 0.2s ease-out both;
+  }
+
+  .animate-pulse-slow {
+    animation: pulseSlow 3s ease-in-out infinite;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulseSlow {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.1;
+  }
+  50% {
+    transform: translateY(-20px);
+    opacity: 0.3;
+  }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.animate-blink {
+  animation: blink 0.6s step-end infinite;
+}
+
+@keyframes glitch {
+  0%, 100% { transform: translate(0); }
+  20% { transform: translate(-2px, 1px); }
+  40% { transform: translate(2px, -1px); }
+  60% { transform: translate(-1px, -2px); }
+  80% { transform: translate(1px, 2px); }
+}
+
+@keyframes glitch-1 {
+  0%, 100% { clip-path: inset(0 0 80% 0); transform: translate(-3px, 0); }
+  25% { clip-path: inset(20% 0 60% 0); transform: translate(3px, 0); }
+  50% { clip-path: inset(40% 0 30% 0); transform: translate(-2px, 0); }
+  75% { clip-path: inset(60% 0 10% 0); transform: translate(2px, 0); }
+}
+
+@keyframes glitch-2 {
+  0%, 100% { clip-path: inset(70% 0 0 0); transform: translate(3px, 0); }
+  25% { clip-path: inset(50% 0 20% 0); transform: translate(-3px, 0); }
+  50% { clip-path: inset(10% 0 50% 0); transform: translate(2px, 0); }
+  75% { clip-path: inset(30% 0 40% 0); transform: translate(-2px, 0); }
+}
+
+.animate-glitch {
+  animation: glitch 0.2s ease-in-out;
+}
+
+.animate-glitch-1 {
+  animation: glitch-1 0.2s ease-in-out;
+}
+
+.animate-glitch-2 {
+  animation: glitch-2 0.2s ease-in-out;
+}

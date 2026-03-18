@@ -1,8 +1,8 @@
-name: nephila
+name: medox
 version: "1.0.0"
 config-version: 2
 
-profile: nephila
+profile: medox
 
 model-paths: ["models"]
 analysis-paths: ["analyses"]
@@ -17,7 +17,7 @@ clean-targets:
   - "dbt_packages"
 
 models:
-  nephila:
+  medox:
     silver:
       +schema: silver
       +materialized: table

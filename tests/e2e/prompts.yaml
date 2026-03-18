@@ -1,4 +1,4 @@
-# Nephila E2E test prompts — versioned interaction test cases.
+# Medox E2E test prompts — versioned interaction test cases.
 # Each case has a prompt and assertions on the agent's final response.
 #
 # Fields:

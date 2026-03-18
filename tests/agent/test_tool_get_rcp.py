@@ -2,7 +2,7 @@
 
 import pytest
 
-from nephila.agent.tools.tool_get_rcp import get_rcp
+from medox.agent.tools.tool_get_rcp import get_rcp
 
 
 class TestGetRcpCisValidation:

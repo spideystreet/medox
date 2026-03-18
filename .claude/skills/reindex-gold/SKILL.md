@@ -40,8 +40,8 @@ Use when: BDPM/ANSM source data has changed, Silver models were updated, or Chro
 5. **Smoke-test the agent tools**:
    ```bash
    uv run dotenv -f .env run -- python -c "
-   from nephila.agent.tools.tool_search_drug import search_drug
-   from nephila.agent.tools.tool_check_interactions import check_interactions
+   from medox.agent.tools.tool_search_drug import search_drug
+   from medox.agent.tools.tool_check_interactions import check_interactions
    print(search_drug.invoke({'query': 'doliprane'}))
    print(check_interactions.invoke({'substance_a': 'warfarine', 'substance_b': 'ibuprofene'}))
    "

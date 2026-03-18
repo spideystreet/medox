@@ -1,6 +1,6 @@
 ---
 name: pr
-description: Create or update a GitHub pull request following Nephila conventions (author spicode-bot, reviewer spideystreet). Invoke manually with /pr — do NOT trigger automatically.
+description: Create or update a GitHub pull request following Medox conventions (author spicode-bot, reviewer spideystreet). Invoke manually with /pr — do NOT trigger automatically.
 disable-model-invocation: true
 ---
 

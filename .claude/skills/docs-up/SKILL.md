@@ -19,11 +19,11 @@ Categorize changed files into impact zones:
 
 | Changed path pattern | Docs impact |
 |----------------------|-------------|
-| `src/nephila/agent/tools/` | `docs/agent/tools.mdx`, `.claude/rules/agent.md` |
-| `src/nephila/agent/nodes/` | `docs/agent/overview.mdx`, `docs/agent/guardrails.mdx` |
-| `src/nephila/agent/graph_agent.py` | `docs/agent/overview.mdx` |
-| `src/nephila/pipeline/assets/` | `docs/pipeline/overview.mdx`, `.claude/rules/pipeline.md` |
-| `src/nephila/pipeline/io/` | `docs/pipeline/silver.mdx`, `docs/pipeline/bronze.mdx` |
+| `src/medox/agent/tools/` | `docs/agent/tools.mdx`, `.claude/rules/agent.md` |
+| `src/medox/agent/nodes/` | `docs/agent/overview.mdx`, `docs/agent/guardrails.mdx` |
+| `src/medox/agent/graph_agent.py` | `docs/agent/overview.mdx` |
+| `src/medox/pipeline/assets/` | `docs/pipeline/overview.mdx`, `.claude/rules/pipeline.md` |
+| `src/medox/pipeline/io/` | `docs/pipeline/silver.mdx`, `docs/pipeline/bronze.mdx` |
 | `dbt/models/silver/` | `docs/dbt/overview.mdx`, `docs/pipeline/silver.mdx`, `.claude/rules/dbt.md` |
 | `dbt/models/sources.yml` | `docs/dbt/overview.mdx`, `docs/pipeline/silver.mdx` |
 | `tests/e2e/prompts.yaml` | no docs change needed |

@@ -1,6 +1,6 @@
 ---
 name: pr-reviewer
-description: Reviews PRs touching src/nephila/agent/ with domain-specific checks. Verifies guardrail integrity, CIS traceability, tool docstring quality, and test coverage for agent node changes.
+description: Reviews PRs touching src/medox/agent/ with domain-specific checks. Verifies guardrail integrity, CIS traceability, tool docstring quality, and test coverage for agent node changes.
 ---
 
 # Agent: pr-reviewer
@@ -10,7 +10,7 @@ Domain-aware code reviewer for changes to the LangGraph agent.
 ## Trigger
 
 Use this agent when:
-- A PR modifies any file under `src/nephila/agent/`
+- A PR modifies any file under `src/medox/agent/`
 - You want a pre-merge check before pushing to GitHub
 - You've added or modified a tool and want to verify it's LLM-ready
 
@@ -59,5 +59,5 @@ Action required: update check_interactions docstring with AINS example
 ## Rules
 
 - Read the files changed, do not assume — use Read/Grep tools
-- Reference `src/nephila/agent/CLAUDE.md` for the canonical graph shape
+- Reference `src/medox/agent/CLAUDE.md` for the canonical graph shape
 - Flag, don't block: output warnings with clear action items

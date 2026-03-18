@@ -1,6 +1,6 @@
 ---
 name: add-agent-tool
-description: Add a new LangChain tool to the Nephila ReAct agent. Use when creating a new tool file, registering it in the graph, and writing its test.
+description: Add a new LangChain tool to the Medox ReAct agent. Use when creating a new tool file, registering it in the graph, and writing its test.
 argument-hint: "<tool-name>"
 ---
 
@@ -8,12 +8,12 @@ argument-hint: "<tool-name>"
 
 ## Steps
 
-1. **Create the tool file** at `src/nephila/agent/tools/tool_<name>.py`:
+1. **Create the tool file** at `src/medox/agent/tools/tool_<name>.py`:
    ```python
    """One-line description of the data source and lookup strategy."""
 
    from langchain_core.tools import tool
-   from nephila.pipeline.config_pipeline import PipelineSettings
+   from medox.pipeline.config_pipeline import PipelineSettings
 
    @tool
    def <tool_name>(<param>: str) -> str:
@@ -31,7 +31,7 @@ argument-hint: "<tool-name>"
        # ... implementation
    ```
 
-2. **Register the tool** in `src/nephila/agent/graph_agent.py`:
+2. **Register the tool** in `src/medox/agent/graph_agent.py`:
    - Add the import
    - Add to the `tools = [...]` list passed to `build_agent()`
 

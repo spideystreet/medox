@@ -21,7 +21,7 @@ disable-model-invocation: true
    ```bash
    uv run dotenv -f .env run -- uv run python scripts/run_eval.py
    ```
-   Note the experiment name printed (e.g. `nephila-<hash>`).
+   Note the experiment name printed (e.g. `medox-<hash>`).
 
 3. **Fetch and display results**
    Write the following script to `/tmp/check_eval.py` then run it:
@@ -60,7 +60,7 @@ disable-model-invocation: true
 
 4. **Investigate failures**
    For any `[FAIL]`, read the comment and:
-   - Check the relevant node/tool in `src/nephila/agent/`
+   - Check the relevant node/tool in `src/medox/agent/`
    - Check the evaluator logic in `scripts/run_eval.py`
    - Use `/add-eval-case` to add a regression case if a new edge case was found
 

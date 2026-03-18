@@ -2,7 +2,7 @@
 
 from langchain_core.messages import AIMessage
 
-from nephila.agent.graph_agent import routing
+from medox.agent.graph_agent import routing
 
 
 def _state(messages: list) -> dict:
