@@ -2314,6 +2314,7 @@ dependencies = [
     { name = "langchain-community" },
     { name = "langchain-openai" },
     { name = "langgraph" },
+    { name = "langgraph-cli", extra = ["inmem"] },
     { name = "pandas" },
     { name = "pdfplumber" },
     { name = "psycopg2-binary" },
@@ -2326,7 +2327,6 @@ dependencies = [
 
 [package.optional-dependencies]
 dev = [
-    { name = "langgraph-cli", extra = ["inmem"] },
     { name = "langsmith" },
     { name = "mypy" },
     { name = "pandas-stubs" },
@@ -2351,7 +2351,7 @@ requires-dist = [
     { name = "langchain-community", specifier = ">=0.3" },
     { name = "langchain-openai", specifier = ">=0.2" },
     { name = "langgraph", specifier = ">=0.2" },
-    { name = "langgraph-cli", extras = ["inmem"], marker = "extra == 'dev'", specifier = ">=0.1" },
+    { name = "langgraph-cli", extras = ["inmem"], specifier = ">=0.1" },
     { name = "langsmith", marker = "extra == 'dev'", specifier = ">=0.7" },
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.11" },
     { name = "pandas", specifier = ">=2.2" },
