@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Routes, Route, useNavigate, Navigate } from "react-router-dom";
 import { Sidebar } from "./components/Sidebar";
 import { ChatView } from "./components/ChatView";
+import { SettingsDialog } from "./components/SettingsDialog";
 import { LandingPage } from "./components/LandingPage";
 import { SetupScreen } from "./components/SetupScreen";
 import { NotFoundPage } from "./components/NotFoundPage";
@@ -35,6 +36,7 @@ function ChatApp() {
     getStoredThreadId,
   );
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   // Redirect to setup if no API key
   useEffect(() => {
@@ -71,6 +73,10 @@ function ChatApp() {
     setActiveThreadId(threadId);
   }, []);
 
+  const handleKeyCleared = useCallback(() => {
+    navigate("/setup", { replace: true });
+  }, [navigate]);
+
   if (!getApiKey()) return null;
 
   return (
@@ -81,11 +87,18 @@ function ChatApp() {
         onNewChat={handleNewChat}
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
+        onOpenSettings={() => setSettingsOpen(true)}
       />
       <ChatView
         threadId={activeThreadId}
         onThreadCreated={handleThreadCreated}
         onMenuClick={() => setSidebarOpen(true)}
+      />
+      <SettingsDialog
+        open={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+        onKeyCleared={handleKeyCleared}
+        onChatsDeleted={() => setActiveThreadId(null)}
       />
     </div>
   );

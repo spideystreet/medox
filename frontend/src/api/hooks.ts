@@ -49,3 +49,15 @@ export function useDeleteThread() {
     },
   });
 }
+
+export function useDeleteAllThreads() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (threadIds: string[]) => {
+      await Promise.all(threadIds.map(deleteThread));
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["threads"] });
+    },
+  });
+}
