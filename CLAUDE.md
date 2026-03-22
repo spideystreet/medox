@@ -33,3 +33,7 @@ Bronze (raw files) → Silver (PostgreSQL via dbt) → Gold (ChromaDB embeddings
 | `scripts/` | `run_eval.py` — LangSmith evaluation |
 | `deploy/` | Hetzner VPS deployment (Dockerfiles, Caddyfile, scripts) |
 | `.github/workflows/` | CI (lint+test), deploy on release, auto version bump |
+
+## Memory
+
+When you learn something important about this project — gotchas, debugging fixes, architecture decisions, env quirks — save it to your project memory so future conversations start with that context. Do this proactively as you work, not just when asked.
