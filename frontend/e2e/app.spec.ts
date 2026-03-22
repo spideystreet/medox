@@ -15,8 +15,8 @@ test.describe("Medox Landing Page", () => {
     await expect(
       page.getByText("Assistant pharmaceutique intelligent"),
     ).toBeVisible();
-    await expect(page.getByText("Works better with")).toBeVisible();
     await expect(page.getByText("Mistral AI")).toBeVisible();
+    await expect(page.getByText("data.gouv.fr")).toBeVisible();
   });
 
   test("enter button navigates to /setup without API key", async ({ page }) => {
@@ -68,22 +68,22 @@ test.describe("Medox App", () => {
     await expect(page.getByTestId("app")).toBeVisible();
     await expect(page.getByTestId("welcome-screen")).toBeVisible();
     await expect(
-      page.getByTestId("welcome-screen").getByText("Medox"),
+      page.getByText("How can I help you?"),
     ).toBeVisible();
     await expect(
-      page.getByText("Assistant pharmaceutique"),
+      page.getByText("BDPM & ANSM"),
     ).toBeVisible();
   });
 
   test("displays sidebar with MEDOX branding", async ({ page }) => {
     await expect(page.getByTestId("sidebar")).toBeVisible();
     await expect(page.getByTestId("new-chat-btn")).toBeVisible();
-    await expect(page.getByText("v0.1.0")).toBeVisible();
+    await expect(page.getByTestId("settings-btn")).toBeVisible();
   });
 
   test("shows suggestion cards on welcome screen", async ({ page }) => {
     const suggestions = page.getByTestId("suggestion");
-    await expect(suggestions).toHaveCount(3);
+    await expect(suggestions).toHaveCount(4);
     await expect(suggestions.first()).toContainText("interactions");
   });
 
@@ -92,7 +92,7 @@ test.describe("Medox App", () => {
     await expect(input).toBeVisible();
     await expect(input).toHaveAttribute(
       "placeholder",
-      "Posez votre question...",
+      "Ask about drug interactions, generics...",
     );
   });
 
@@ -110,7 +110,7 @@ test.describe("Medox App", () => {
 
   test("disclaimer text is visible", async ({ page }) => {
     await expect(
-      page.getByText("Medox peut faire des erreurs"),
+      page.getByText("Medox can make mistakes"),
     ).toBeVisible();
   });
 });
@@ -257,8 +257,8 @@ test.describe("Medox Chat Messages", () => {
     await input.fill("Test question");
     await page.getByTestId("send-btn").click();
 
-    await expect(page.getByTestId("user-message")).toBeVisible();
-    await expect(page.getByTestId("user-message")).toContainText(
+    await expect(page.getByTestId("user-message").first()).toBeVisible();
+    await expect(page.getByTestId("user-message").first()).toContainText(
       "Test question",
     );
   });
@@ -351,5 +351,114 @@ test.describe("Medox Mobile", () => {
     await page.goto("/chat");
     await page.getByTestId("menu-btn").click();
     await expect(page.getByTestId("sidebar-overlay")).toBeVisible();
+  });
+});
+
+test.describe("Medox Settings", () => {
+  test.beforeEach(async ({ page }) => {
+    await setFakeApiKey(page);
+    await page.goto("/chat");
+  });
+
+  test("opens settings dialog from sidebar", async ({ page }) => {
+    await page.getByTestId("settings-btn").click();
+    await expect(page.getByTestId("settings-dialog")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "SETTINGS" })).toBeVisible();
+  });
+
+  test("closes settings with X button", async ({ page }) => {
+    await page.getByTestId("settings-btn").click();
+    await expect(page.getByTestId("settings-dialog")).toBeVisible();
+    await page.getByLabel("Close settings").click();
+    await expect(page.getByTestId("settings-dialog")).not.toBeVisible();
+  });
+
+  test("closes settings with Escape key", async ({ page }) => {
+    await page.getByTestId("settings-btn").click();
+    await expect(page.getByTestId("settings-dialog")).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(page.getByTestId("settings-dialog")).not.toBeVisible();
+  });
+
+  test("closes settings by clicking backdrop", async ({ page }) => {
+    await page.getByTestId("settings-btn").click();
+    const dialog = page.getByTestId("settings-dialog");
+    await expect(dialog).toBeVisible();
+    // Click the backdrop (top-left corner, outside the modal)
+    await dialog.click({ position: { x: 10, y: 10 } });
+    await expect(dialog).not.toBeVisible();
+  });
+
+  test("shows masked current API key", async ({ page }) => {
+    await page.getByTestId("settings-btn").click();
+    await expect(page.getByText("sk-or-te...-e2e")).toBeVisible();
+    await expect(page.getByText("Active")).toBeVisible();
+  });
+
+  test("can update API key", async ({ page }) => {
+    await page.getByTestId("settings-btn").click();
+    await page.getByTestId("settings-api-key-input").fill("sk-or-new-key-1234567890");
+    await page.getByTestId("settings-save-btn").click();
+    await expect(page.getByText("Key updated.")).toBeVisible();
+  });
+
+  test("validates short API key", async ({ page }) => {
+    await page.getByTestId("settings-btn").click();
+    await page.getByTestId("settings-api-key-input").fill("short");
+    await page.getByTestId("settings-save-btn").click();
+    await expect(page.getByText("doesn't look like a valid")).toBeVisible();
+  });
+
+  test("validates empty API key", async ({ page }) => {
+    await page.getByTestId("settings-btn").click();
+    await page.getByTestId("settings-save-btn").click();
+    await expect(page.getByText("API key is required")).toBeVisible();
+  });
+
+  test("remove key redirects to setup", async ({ page }) => {
+    await page.getByTestId("settings-btn").click();
+    await page.getByTestId("settings-remove-btn").click();
+    await expect(page).toHaveURL(/\/setup/);
+  });
+
+  test("shows conversation count", async ({ page }) => {
+    await page.route("**/api/threads/search", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify([
+          { thread_id: "t1", metadata: { title: "Chat 1" }, created_at: "2026-03-23T10:00:00Z", updated_at: "2026-03-23T10:00:00Z" },
+          { thread_id: "t2", metadata: { title: "Chat 2" }, created_at: "2026-03-23T09:00:00Z", updated_at: "2026-03-23T09:00:00Z" },
+        ]),
+      });
+    });
+    await page.goto("/chat");
+    await page.getByTestId("settings-btn").click();
+    await expect(page.getByText("2 conversations")).toBeVisible();
+  });
+
+  test("delete all button requires confirmation", async ({ page }) => {
+    await page.route("**/api/threads/search", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify([
+          { thread_id: "t1", metadata: { title: "Chat 1" }, created_at: "2026-03-23T10:00:00Z", updated_at: "2026-03-23T10:00:00Z" },
+        ]),
+      });
+    });
+    await page.goto("/chat");
+    await page.getByTestId("settings-btn").click();
+    const btn = page.getByTestId("delete-all-btn");
+    await expect(btn).toContainText("Delete all");
+    await btn.click();
+    await expect(btn).toContainText("Confirm");
+  });
+
+  test("shows about section with version", async ({ page }) => {
+    await page.getByTestId("settings-btn").click();
+    await expect(page.getByText("0.2.3")).toBeVisible();
+    await expect(page.getByText("BDPM + ANSM")).toBeVisible();
+    await expect(page.getByText("ministral-8b")).toBeVisible();
   });
 });
