@@ -24,9 +24,9 @@ uv run dotenv -f dbt/.env run -- uv run dbt run --project-dir dbt --profiles-dir
 uv run dotenv -f dbt/.env run -- uv run dbt test --project-dir dbt --profiles-dir dbt
 ```
 
-## LangGraph Studio
+## API
 ```bash
-uv run dotenv -f .env run -- uv run langgraph dev    # UI at smith.langchain.com/studio → connect localhost:2024
+uv run dotenv -f .env run -- uv run uvicorn medox.api.app:app --host 0.0.0.0 --port 2024
 ```
 
 ## Frontend

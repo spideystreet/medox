@@ -16,6 +16,7 @@ from medox.pipeline.io.builder_documents import (
     build_medicament_documents,
 )
 from medox.pipeline.io.embedder_local import get_embedding_function
+from medox.retrieval.hits import COLLECTION_METADATA
 
 BATCH_SIZE = 100
 
@@ -79,7 +80,11 @@ def _upsert_collection(
         client.delete_collection(name=name)
     except Exception:
         pass  # Collection may not exist yet on first run
-    collection = client.create_collection(name=name, embedding_function=ef)  # type: ignore[arg-type]
+    collection = client.create_collection(
+        name=name,
+        embedding_function=ef,  # type: ignore[arg-type]
+        metadata=COLLECTION_METADATA,
+    )
 
     ids, documents, metadatas = builder()  # type: ignore[operator]
     total = len(ids)

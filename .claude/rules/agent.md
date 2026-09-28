@@ -1,59 +1,29 @@
 ---
 paths:
   - src/medox/agent/**
+  - src/medox/api/**
   - tests/agent/**
 ---
 
-# Agent — Architecture Context
+# Agent
 
-## LangGraph ReAct State Machine
+The served agent is `src/medox/api/agent.py`: a Mistral tool loop, at most six rounds. The server key is `MISTRAL_API_KEY`, else `OPENROUTER_API_KEY`.
 
-State defined in `model_state.py` (`AgentState` — TypedDict + `add_messages`).
+## Tools
 
-```
-START → [agent] ──► tool_calls? ──► [tools] ──► [agent] (loop)
-                 └─► no tool_calls ──► [guardrail] ──► critical? ──► [warn] → END
-                                                    └─► ok ──────► [response] → END
-```
+| File | Function | Data |
+|------|----------|------|
+| `tool_search_drug.py` | `search_drug` | Chroma `idx_bdpm_medicament_v1` |
+| `tool_find_generics.py` | `find_generics` | Silver generics |
+| `tool_check_interactions.py` | `check_interactions` | Silver interactions and classes, then Chroma |
+| `tool_get_rcp.py` | `get_rcp` | ANSM safety notices in `silver_bdpm__info_importante` (not the full RCP) |
 
-- **agent node**: LLM with bound tools (ReAct loop)
-- **tools node**: `ToolNode` — runs whichever tool the LLM called
-- **guardrail node**: mandatory before every final response — parses all ToolMessages for interaction levels
-- **warn node**: blocks answer when `contre-indication` or `association déconseillée` is found
-- **response node**: extracts `source_cis` from ToolMessages for traceability
+SQL lives in `agent/queries.py`.
 
-## Tools (`agent/tools/`)
+## Guardrail
 
-| File | LangChain tool | Data source |
-|------|---------------|-------------|
-| `tool_search_drug.py` | `search_drug` | ChromaDB `idx_bdpm_medicament_v1` |
-| `tool_find_generics.py` | `find_generics` | Silver `silver_bdpm__generique` |
-| `tool_check_interactions.py` | `check_interactions` | Silver `silver_ansm__substance_class` + `silver_ansm__interaction` + ChromaDB `idx_ansm_interaction_v1` |
-| `tool_get_rcp.py` | `get_rcp` | Silver `silver_bdpm__info_importante` |
-
-SQL queries are centralized in `agent/queries.py` (lazy singleton engine, Pydantic-validated returns).
-Tools delegate to `queries.*` for DB access and handle formatting + ChromaDB themselves.
-
-## Guardrails (non-negotiable)
-
-- **No direct advice**: every response must reference the RCP (`silver_bdpm__info_importante`)
-- **Interaction check mandatory**: guardrail runs before every final response
-- **CIS traceability**: `source_cis` set in `AgentState` on every response
-- **Self-hosted only**: ChromaDB local, no external cloud vector store
-
-## AgentState fields
-
-| Field | Type | Purpose |
-|-------|------|---------|
-| `messages` | `Annotated[list, add_messages]` | Full conversation (LangGraph managed) |
-| `cis_codes` | `list[str]` | CIS codes mentioned in the conversation |
-| `interactions_found` | `list[dict]` | Parsed from guardrail (`niveau_contrainte`, `detail`) |
-| `source_cis` | `str \| None` | First CIS extracted from ToolMessages |
-
-## LangGraph Studio
+`agent/safety.py` reads `[niveau] A + B` lines from tool output. `contre-indication` and `association déconseillée` are prefixed onto the answer. Jev is eval-only.
 
 ```bash
-uv run dotenv -f .env run -- uv run langgraph dev    # connect localhost:2024
+uv run dotenv -f .env run -- uv run uvicorn medox.api.app:app --host 0.0.0.0 --port 2024
 ```
-
-Graph entrypoint declared in `langgraph.json` at project root.

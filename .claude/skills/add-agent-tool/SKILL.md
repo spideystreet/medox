@@ -1,6 +1,6 @@
 ---
 name: add-agent-tool
-description: Add a new LangChain tool to the Medox ReAct agent. Use when creating a new tool file, registering it in the graph, and writing its test.
+description: Add a tool function to the Medox agent. Use when creating a tool file, registering it in the API loop, and writing its test.
 argument-hint: "<tool-name>"
 ---
 
@@ -12,10 +12,8 @@ argument-hint: "<tool-name>"
    ```python
    """One-line description of the data source and lookup strategy."""
 
-   from langchain_core.tools import tool
    from medox.pipeline.config_pipeline import PipelineSettings
 
-   @tool
    def <tool_name>(<param>: str) -> str:
        """
        <What this tool does — written for the LLM, not a human developer.>
@@ -31,9 +29,7 @@ argument-hint: "<tool-name>"
        # ... implementation
    ```
 
-2. **Register the tool** in `src/medox/agent/graph_agent.py`:
-   - Add the import
-   - Add to the `tools = [...]` list passed to `build_agent()`
+2. **Register the tool** in `src/medox/api/agent.py` (`TOOLS`) and in `_dispatch_tool` in `src/medox/api/app.py`.
 
 3. **Docstring rules** (critical — the LLM uses this to decide when/how to call the tool):
    - Written in English

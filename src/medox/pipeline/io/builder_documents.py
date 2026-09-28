@@ -9,6 +9,8 @@ from typing import Any
 import pandas as pd
 from sqlalchemy import Engine
 
+from medox.retrieval.hits import E5_PASSAGE_PREFIX
+
 
 def build_medicament_documents(
     engine: Engine,
@@ -46,7 +48,7 @@ def build_medicament_documents(
 
     for row in df.itertuples():
         ids.append(str(row.cis))
-        documents.append(_format_medicament(row))
+        documents.append(f"{E5_PASSAGE_PREFIX}{_format_medicament(row)}")
         metadatas.append(
             {
                 "cis": int(str(row.cis)),
@@ -73,7 +75,7 @@ def build_interaction_documents(
     for row in df.itertuples():
         key = f"{row.substance_a}|{row.substance_b}"
         ids.append(hashlib.md5(key.encode()).hexdigest())
-        documents.append(_format_interaction(row))
+        documents.append(f"{E5_PASSAGE_PREFIX}{_format_interaction(row)}")
         metadatas.append(
             {
                 "substance_a": row.substance_a,

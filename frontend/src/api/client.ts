@@ -1,9 +1,22 @@
 const API_BASE = "/api";
 
+function generateId(): string {
+  if (typeof crypto !== "undefined" && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  // Fallback for non-secure contexts (HTTP over LAN)
+  const bytes = new Uint8Array(16);
+  crypto.getRandomValues(bytes);
+  bytes[6] = (bytes[6] & 0x0f) | 0x40;
+  bytes[8] = (bytes[8] & 0x3f) | 0x80;
+  const hex = Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+}
+
 function getUserId(): string {
   let id = localStorage.getItem("medox_user_id");
   if (!id) {
-    id = crypto.randomUUID();
+    id = generateId();
     localStorage.setItem("medox_user_id", id);
   }
   return id;
@@ -97,6 +110,7 @@ export async function getThreadState(
 
 export interface StreamCallbacks {
   onToken: (token: string) => void;
+  onStatus?: (label: string) => void;
   onDone: (fullMessage: string) => void;
   onError: (error: Error) => void;
 }
@@ -105,7 +119,6 @@ export async function streamMessage(
   threadId: string,
   message: string,
   callbacks: StreamCallbacks,
-  apiKey?: string | null,
 ): Promise<void> {
   const body: Record<string, unknown> = {
     assistant_id: "medox_agent",
@@ -114,10 +127,6 @@ export async function streamMessage(
     },
     stream_mode: ["messages"],
   };
-
-  if (apiKey) {
-    body.config = { configurable: { api_key: apiKey } };
-  }
 
   const res = await fetch(`${API_BASE}/threads/${threadId}/runs/stream`, {
     method: "POST",
@@ -176,6 +185,11 @@ export async function streamMessage(
           const errMsg = parsed?.message || parsed?.error || "Unknown server error";
           callbacks.onError(new Error(errMsg));
           return;
+        }
+
+        if (currentEvent === "status" && typeof parsed?.label === "string") {
+          callbacks.onStatus?.(parsed.label);
+          continue;
         }
 
         // messages/partial: accumulated AI content as array with one object

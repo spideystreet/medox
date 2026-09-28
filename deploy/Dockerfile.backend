@@ -24,7 +24,6 @@ RUN --mount=type=cache,target=/root/.cache/huggingface \
 
 # Copy source code (only this layer rebuilds on code changes)
 COPY src/ src/
-COPY langgraph.json .
 
 # Re-link local package without re-resolving deps
 RUN --mount=type=cache,target=/root/.cache/uv \
@@ -35,4 +34,4 @@ EXPOSE 2024
 HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
     CMD curl -f http://localhost:2024/ok || exit 1
 
-CMD ["uv", "run", "langgraph", "dev", "--host", "0.0.0.0", "--port", "2024", "--no-browser"]
+CMD ["uv", "run", "uvicorn", "medox.api.app:app", "--host", "0.0.0.0", "--port", "2024"]

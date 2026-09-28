@@ -1,13 +1,12 @@
 """Semantic drug search in ChromaDB idx_bdpm_medicament_v1."""
 
 import chromadb
-from langchain_core.tools import tool
 
 from medox.pipeline.config_pipeline import PipelineSettings
 from medox.pipeline.io.embedder_local import get_embedding_function
+from medox.retrieval.hits import display_document, semantic_query
 
 
-@tool
 def search_drug(query: str) -> str:
     """
     Search for drug information by name, active substance, or description.
@@ -18,19 +17,13 @@ def search_drug(query: str) -> str:
     ef = get_embedding_function(settings.embedding_model)
 
     collection = client.get_collection("idx_bdpm_medicament_v1", embedding_function=ef)  # type: ignore[arg-type]
-    results = collection.query(
-        query_texts=[query],
-        n_results=5,
-        include=["documents", "metadatas"],
-    )
+    where = {"cis": int(query)} if query.strip().isdigit() else None
+    hits = semantic_query(collection, query, n_results=8, where=where)
 
-    docs = (results["documents"] or [[]])[0]
-    metas = (results["metadatas"] or [[]])[0]
-
-    if not docs:
+    if not hits:
         return f"No drugs found for query: {query!r}"
 
     lines = []
-    for doc, meta in zip(docs, metas):
-        lines.append(f"CIS {meta['cis']}: {doc}")
+    for hit in hits:
+        lines.append(f"CIS {hit.metadata['cis']}: {display_document(hit.document)}")
     return "\n\n".join(lines)

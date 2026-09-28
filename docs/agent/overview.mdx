@@ -1,79 +1,22 @@
 ---
 title: "Vue d'ensemble de l'agent"
-description: "Machine à états LangGraph ReAct — graphe et état de l'agent"
+description: "Boucle d'outils FastAPI et SDK Mistral"
 ---
 
-## Architecture ReAct
+L'agent servi en production est une boucle d'outils dans `src/medox/api/agent.py`. Le modèle est appelé via le SDK Mistral (`mistralai`). Tant qu'il demande un outil, le serveur l'exécute et renvoie le résultat. Au plus six tours.
 
-L'agent Medox est implémenté avec **LangGraph** comme machine à états finie. Il suit le pattern **ReAct** (Reasoning + Acting) : le LLM alterne entre raisonnement et appels d'outils jusqu'à produire une réponse finale.
-
-```
-START → [agent] ──► tool_calls? ──► [tools] ──► [agent] (loop)
-                 └─► no tool_calls ──► [guardrail] ──► critical? ──► [warn] → END
-                                                    └─► ok ──────► [response] → END
-```
-
-### Nœuds du graphe
-
-| Nœud | Rôle |
-|------|------|
-| `agent` | LLM avec outils liés (boucle ReAct) |
-| `tools` | `ToolNode` LangGraph — exécute l'outil appelé par le LLM |
-| `guardrail` | Nœud **obligatoire** avant chaque réponse finale — analyse les interactions trouvées |
-| `response` | Formule la réponse finale, extrait le `source_cis` |
-| `warn` | Bloque la réponse en cas d'interaction critique |
-
-### Routage conditionnel
-
-Deux arêtes conditionnelles pilotent le flux :
-
-1. **Après `agent`** : si le dernier message contient des `tool_calls` → `tools`, sinon → `guardrail`
-2. **Après `guardrail`** : si une interaction critique est détectée → `warn`, sinon → `response`
-
-## LLM et outils
-
-Le LLM est configuré via **OpenRouter** (modèle configurable). Il est lié aux 4 outils disponibles via `llm.bind_tools(TOOLS, parallel_tool_calls=False)` — l'exécution séquentielle garantit que le guardrail inspecte tous les résultats.
+La clé est celle du serveur : `MISTRAL_API_KEY`, sinon `OPENROUTER_API_KEY`.
 
 ```python
 TOOLS = [search_drug, find_generics, check_interactions, get_rcp]
 ```
 
-Le prompt système impose des règles non négociables :
-- Appeler `check_interactions` avant toute recommandation
-- Ne jamais donner de conseil médical direct
-- Toujours inclure le code CIS
-- Rapporter chaque interaction avec son niveau de contrainte ANSM
-- Ne jamais compléter avec des connaissances pharmacologiques hors outil si `check_interactions` ne trouve rien
+Avant la réponse finale, `safety.warning_prefix` préfixe l'avertissement si un outil a renvoyé une contre-indication ou une association déconseillée.
 
-## État de l'agent (`AgentState`)
+Le prompt impose :
 
-L'état est défini dans `agent/model_state.py` (`MessagesState` TypedDict + `add_messages`) :
-
-| Champ | Type | Rôle |
-|-------|------|------|
-| `messages` | `Annotated[list, add_messages]` | Conversation complète (géré par LangGraph) |
-| `cis_codes` | `list[str]` | Codes CIS mentionnés dans la conversation |
-| `interactions_found` | `list[dict]` | Extraites par le guardrail (`niveau_contrainte`, `detail`) |
-| `source_cis` | `str \| None` | Premier CIS extrait des ToolMessages |
-
-## Utilisation
-
-```python
-from medox.agent.graph_agent import graph
-
-# Invoquer l'agent
-result = graph.invoke({
-    "messages": [
-        {"role": "user", "content": "Y a-t-il des interactions entre l'ibuprofène et l'aspirine ?"}
-    ]
-})
-
-# Réponse finale
-print(result["messages"][-1].content)
-
-# Interactions trouvées
-print(result["interactions_found"])
-
-# CIS source
-print(result["source_cis"])
-```
+- appeler `check_interactions` avant une recommandation
+- ne pas donner de conseil médical direct
+- citer le code CIS
+- rapporter le niveau de contrainte ANSM renvoyé par l'outil
+- ne pas compléter hors outil si aucune interaction n'est trouvée

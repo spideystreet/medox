@@ -33,14 +33,17 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
     }
   };
 
+  const canSend = value.trim().length > 0 && !disabled;
+
   return (
     <div className="px-4 pb-4 pt-2">
       <div
         className="
-          max-w-3xl mx-auto flex items-center gap-2
-          bg-surface-raised border border-surface-border rounded-xl
-          px-4 py-2.5
-          focus-within:border-text-muted transition-colors duration-150
+          max-w-2xl mx-auto flex items-end gap-2
+          bg-surface-raised border border-surface-border/60 rounded-2xl
+          pl-5 pr-2 py-2
+          focus-within:border-accent/40 focus-within:shadow-soft
+          transition-all duration-300
         "
       >
         <textarea
@@ -48,42 +51,42 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
           value={value}
           onChange={(e) => setValue(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Posez votre question..."
+          placeholder="Ask about drug interactions, generics..."
           disabled={disabled}
           rows={1}
           className="
-            flex-1 bg-transparent text-sm text-text-primary
-            placeholder:text-text-muted resize-none outline-none
-            max-h-40 disabled:opacity-50
+            flex-1 bg-transparent text-[14px] text-text-primary py-1.5
+            placeholder:text-text-muted/40 resize-none outline-none
+            max-h-40 disabled:opacity-50 leading-normal
           "
           data-testid="chat-input"
         />
         <button
           onClick={handleSubmit}
-          disabled={disabled || !value.trim()}
-          className="
-            shrink-0 p-2 rounded-lg
-            text-text-muted hover:text-text-primary
-            disabled:opacity-30 disabled:cursor-not-allowed
-            transition-colors duration-150
-          "
+          disabled={!canSend}
+          className={`
+            shrink-0 p-2.5 rounded-xl transition-all duration-200
+            ${canSend
+              ? "bg-accent text-surface hover:bg-accent/80 hover:scale-105 active:scale-95 shadow-sm"
+              : "text-text-muted/20 cursor-not-allowed"
+            }
+          `}
           data-testid="send-btn"
           aria-label="Send message"
         >
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
             <path
-              d="M9 15V3M9 3l5 5M9 3L4 8"
+              d="M8 13V3M8 3l4.5 4.5M8 3L3.5 7.5"
               stroke="currentColor"
-              strokeWidth="1.5"
+              strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
             />
           </svg>
         </button>
       </div>
-      <p className="text-center text-[11px] text-text-muted mt-2">
-        Medox peut faire des erreurs. V&eacute;rifiez les informations
-        importantes.
+      <p className="text-center text-[11px] text-text-muted/30 mt-2">
+        Medox can make mistakes. Always verify important information.
       </p>
     </div>
   );

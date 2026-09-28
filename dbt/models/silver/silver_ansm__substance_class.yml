@@ -12,7 +12,7 @@ models:
         description: "Uppercased ANSM pharmacological class name."
         data_tests:
           - not_null
-      - name: source
+      - name: mapping_source
         description: "Origin of the mapping: parenthetical member list or Voir aussi reference."
         data_tests:
           - not_null

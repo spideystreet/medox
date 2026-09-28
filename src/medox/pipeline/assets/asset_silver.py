@@ -1,6 +1,8 @@
 """Silver layer — Load Bronze files into PostgreSQL raw schema, then run dbt transformations."""
 
+from collections.abc import Iterator
 from pathlib import Path
+from typing import Any
 
 from dagster import AssetExecutionContext, AssetKey, AssetSpec, asset, multi_asset
 from dagster_dbt import DbtCliResource, dbt_assets
@@ -12,7 +14,6 @@ from medox.pipeline.io.loader_bdpm import (
     load_interactions_to_raw,
     load_substance_classes_to_raw,
 )
-from medox.pipeline.io.loader_open_medic import load_open_medic_to_raw
 from medox.pipeline.io.parser_ansm import parse_thesaurus_classes, parse_thesaurus_pdf
 
 DBT_MANIFEST = Path("dbt/target/manifest.json")
@@ -68,21 +69,7 @@ def ansm_classes_to_raw(context: AssetExecutionContext) -> None:
     context.add_output_metadata({"mappings_loaded": count})
 
 
-@asset(
-    key=AssetKey(["raw", "open_medic"]),
-    group_name="silver",
-    deps=["open_medic_raw"],
-)
-def open_medic_to_raw(context: AssetExecutionContext) -> None:
-    """Load the Open Medic CIP13 CSV from Bronze into raw.open_medic."""
-    settings = PipelineSettings()
-    csv_path = settings.bronze_dir / "open_medic" / f"NB_{settings.open_medic_year}_cip13.CSV.gz"
-    engine = create_engine(settings.postgres_dsn)
-    count = load_open_medic_to_raw(csv_path, engine)
-    context.add_output_metadata({"rows_loaded": count, "year": settings.open_medic_year})
-
-
 @dbt_assets(manifest=DBT_MANIFEST, select="silver")
-def silver_dbt_assets(context: AssetExecutionContext, dbt: DbtCliResource) -> None:  # type: ignore[misc]
+def silver_dbt_assets(context: AssetExecutionContext, dbt: DbtCliResource) -> Iterator[Any]:
     """Run and test dbt silver models. Each model becomes a Dagster asset; each dbt test becomes an asset check."""  # noqa: E501
     yield from dbt.cli(["build"], context=context).stream()

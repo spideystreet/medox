@@ -1,15 +1,29 @@
-"""Fetch RCP (Résumé des Caractéristiques du Produit) links from Silver layer."""
+"""Fetch ANSM important safety notices linked from the BDPM for a CIS code."""
 
-from langchain_core.tools import tool
+import html
+import re
 
 from medox.agent.queries import get_rcp_info
 
+_TAG = re.compile(r"<[^>]+>")
+_HREF = re.compile(r"""href=['"]([^'"]+)['"]""", re.IGNORECASE)
 
-@tool
+
+def format_safety_notice(raw: str) -> str:
+    """Turn an HTML notice into plain text plus its link, when there is one."""
+    href = _HREF.search(raw)
+    text = html.unescape(_TAG.sub(" ", raw))
+    text = re.sub(r"\s+", " ", text).strip()
+    url = href.group(1) if href else ""
+    if url and url not in text:
+        return f"{text} — {url}" if text else url
+    return text
+
+
 def get_rcp(cis: str) -> str:
     """
-    Get the RCP (Résumé des Caractéristiques du Produit) and important safety info for a drug.
-    Always cite this in responses. Never give medical advice without referencing the RCP.
+    Get ANSM important safety notices for a drug, by CIS code.
+    This is not the full RCP. Cite the notice and its link when one is returned.
     """
     cis = cis.strip()
     if not cis.isdigit():
@@ -18,10 +32,14 @@ def get_rcp(cis: str) -> str:
     rows = get_rcp_info(int(cis))
 
     if not rows:
-        return f"No RCP information found for CIS {cis}. Refer to base-donnees-publique.medicaments.gouv.fr"  # noqa: E501
+        return (
+            f"No ANSM safety notice found for CIS {cis}. "
+            "Refer to base-donnees-publique.medicaments.gouv.fr"
+        )
 
-    lines = [f"RCP / Important information for CIS {cis}:"]
+    lines = [f"ANSM safety notices for CIS {cis}:"]
     for row in rows:
-        date = f"(from {row.date_debut})" if row.date_debut else ""
-        lines.append(f"  {date} {row.texte_info_importante or '(see BDPM for RCP link)'}")
+        date = f"(from {row.date_debut}) " if row.date_debut else ""
+        notice = format_safety_notice(row.texte_info_importante or "")
+        lines.append(f"  {date}{notice or '(see the BDPM record)'}")
     return "\n".join(lines)

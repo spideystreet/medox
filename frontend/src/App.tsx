@@ -1,11 +1,18 @@
 import { useState, useEffect, useCallback } from "react";
-import { Routes, Route, useNavigate, Navigate } from "react-router-dom";
+import {
+  Outlet,
+  createRootRoute,
+  createRoute,
+  createRouter,
+  redirect,
+  useNavigate,
+  RouterProvider,
+} from "@tanstack/react-router";
 import { Sidebar } from "./components/Sidebar";
 import { ChatView } from "./components/ChatView";
+import { SettingsDialog } from "./components/SettingsDialog";
 import { LandingPage } from "./components/LandingPage";
-import { SetupScreen } from "./components/SetupScreen";
 import { NotFoundPage } from "./components/NotFoundPage";
-import { getApiKey, setApiKey } from "./api/keys";
 
 const STORAGE_KEY = "medox:activeThread";
 
@@ -30,18 +37,11 @@ function storeThreadId(threadId: string | null) {
 }
 
 function ChatApp() {
-  const navigate = useNavigate();
   const [activeThreadId, setActiveThreadId] = useState<string | null>(
     getStoredThreadId,
   );
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  // Redirect to setup if no API key
-  useEffect(() => {
-    if (!getApiKey()) {
-      navigate("/setup", { replace: true });
-    }
-  }, [navigate]);
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   useEffect(() => {
     storeThreadId(activeThreadId);
@@ -71,8 +71,6 @@ function ChatApp() {
     setActiveThreadId(threadId);
   }, []);
 
-  if (!getApiKey()) return null;
-
   return (
     <div className="h-screen flex overflow-hidden" data-testid="app">
       <Sidebar
@@ -81,11 +79,17 @@ function ChatApp() {
         onNewChat={handleNewChat}
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
+        onOpenSettings={() => setSettingsOpen(true)}
       />
       <ChatView
         threadId={activeThreadId}
         onThreadCreated={handleThreadCreated}
         onMenuClick={() => setSidebarOpen(true)}
+      />
+      <SettingsDialog
+        open={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+        onChatsDeleted={() => setActiveThreadId(null)}
       />
     </div>
   );
@@ -93,46 +97,47 @@ function ChatApp() {
 
 function LandingRoute() {
   const navigate = useNavigate();
-  const handleEnter = () => {
-    if (getApiKey()) {
-      navigate("/chat");
-    } else {
-      navigate("/setup");
-    }
-  };
-  return <LandingPage onEnter={handleEnter} />;
+  return <LandingPage onEnter={() => navigate({ to: "/chat" })} />;
 }
 
-function SetupRoute() {
-  const navigate = useNavigate();
-  const handleSave = (key: string) => {
-    setApiKey(key);
-    navigate("/chat");
-  };
-  return <SetupScreen onSave={handleSave} />;
-}
+const rootRoute = createRootRoute({
+  component: () => <Outlet />,
+});
 
-function RequireKey({ children }: { children: React.ReactNode }) {
-  if (!getApiKey()) {
-    return <Navigate to="/setup" replace />;
+const indexRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/",
+  component: LandingRoute,
+});
+
+const chatRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/chat",
+  component: ChatApp,
+});
+
+const setupRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/setup",
+  beforeLoad: () => {
+    throw redirect({ to: "/chat" });
+  },
+  component: () => null,
+});
+
+const routeTree = rootRoute.addChildren([indexRoute, setupRoute, chatRoute]);
+
+export const router = createRouter({
+  routeTree,
+  defaultNotFoundComponent: NotFoundPage,
+});
+
+declare module "@tanstack/react-router" {
+  interface Register {
+    router: typeof router;
   }
-  return <>{children}</>;
 }
 
 export function App() {
-  return (
-    <Routes>
-      <Route path="/" element={<LandingRoute />} />
-      <Route path="/setup" element={<SetupRoute />} />
-      <Route
-        path="/chat"
-        element={
-          <RequireKey>
-            <ChatApp />
-          </RequireKey>
-        }
-      />
-      <Route path="*" element={<NotFoundPage />} />
-    </Routes>
-  );
+  return <RouterProvider router={router} />;
 }

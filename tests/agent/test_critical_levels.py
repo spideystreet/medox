@@ -1,17 +1,7 @@
-"""Verify CRITICAL_LEVELS is a single source of truth across nodes."""
+"""Critical ANSM levels used by the safety prefix."""
 
-from medox.agent.model_state import CRITICAL_LEVELS
-from medox.agent.nodes import node_guardrail, node_warn
+from medox.agent.safety import CRITICAL_LEVELS
 
 
-class TestCriticalLevelsSingleSource:
-    def test_guardrail_uses_model_state_constant(self):
-        assert node_guardrail.CRITICAL_LEVELS is CRITICAL_LEVELS
-
-    def test_warn_uses_model_state_constant(self):
-        assert node_warn.CRITICAL_LEVELS is CRITICAL_LEVELS
-
-    def test_contains_expected_levels(self):
-        assert "contre-indication" in CRITICAL_LEVELS
-        assert "association déconseillée" in CRITICAL_LEVELS
-        assert len(CRITICAL_LEVELS) == 2
+def test_contains_the_two_critical_levels() -> None:
+    assert CRITICAL_LEVELS == frozenset({"contre-indication", "association déconseillée"})
