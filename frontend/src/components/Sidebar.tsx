@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link } from "@tanstack/react-router";
 import { useThreads, useCreateThread, useDeleteThread } from "../api/hooks";
 import type { Thread } from "../api/client";
 
@@ -71,7 +71,7 @@ export function Sidebar({
       >
         <div className="p-4">
           <div className="flex items-center justify-between mb-4">
-            <Link to="/" className="font-pixel text-pixel-xs text-text-muted tracking-wider hover:text-text-primary transition-colors">
+            <Link to="/" className="font-sans text-lg font-medium tracking-tight text-text-primary hover:text-accent transition-colors">
               MEDOX
             </Link>
             <button

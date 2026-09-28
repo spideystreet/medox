@@ -53,7 +53,7 @@ export function WelcomeScreen({ onSuggestionClick }: WelcomeScreenProps) {
         {/* Greeting */}
         <div className="mb-10">
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-accent/20 to-accent/5 border border-accent/10 mb-5">
-            <span className="font-pixel text-pixel-xs text-accent tracking-wider">M</span>
+            <span className="font-serif text-lg text-accent">M</span>
           </div>
           <h1 className="text-2xl md:text-3xl font-light text-text-primary mb-2 tracking-tight">
             How can I help you?

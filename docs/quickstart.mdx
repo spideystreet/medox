@@ -97,20 +97,10 @@ uv run dagster asset materialize --select gold_embeddings
 
 Ou depuis l'interface web : sélectionner tous les assets → **Materialize all**.
 
-## Étape 5 — Interroger l'agent
+## Étape 5 — Lancer l'API
 
-Une fois le pipeline complété, lancer l'agent :
-
-```python
-from medox.agent.graph_agent import graph
-
-result = graph.invoke({
-    "messages": [{"role": "user", "content": "Quelles sont les interactions du paracétamol avec la warfarine ?"}]
-})
-
-print(result["messages"][-1].content)
+```bash
+uv run dotenv -f .env run -- uv run uvicorn medox.api.app:app --host 0.0.0.0 --port 2024
 ```
 
-<Note>
-LangSmith est optionnel mais recommandé pour observer les traces de l'agent. Configurer `LANGCHAIN_API_KEY` et `LANGCHAIN_TRACING_V2=true` dans `.env`.
-</Note>
+Le frontend (`cd frontend && npm run dev`) parle à cette API. La clé du modèle est `MISTRAL_API_KEY` ou `OPENROUTER_API_KEY` dans `.env`.

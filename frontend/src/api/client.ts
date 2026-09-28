@@ -110,6 +110,7 @@ export async function getThreadState(
 
 export interface StreamCallbacks {
   onToken: (token: string) => void;
+  onStatus?: (label: string) => void;
   onDone: (fullMessage: string) => void;
   onError: (error: Error) => void;
 }
@@ -118,7 +119,6 @@ export async function streamMessage(
   threadId: string,
   message: string,
   callbacks: StreamCallbacks,
-  apiKey?: string | null,
 ): Promise<void> {
   const body: Record<string, unknown> = {
     assistant_id: "medox_agent",
@@ -127,10 +127,6 @@ export async function streamMessage(
     },
     stream_mode: ["messages"],
   };
-
-  if (apiKey) {
-    body.config = { configurable: { api_key: apiKey } };
-  }
 
   const res = await fetch(`${API_BASE}/threads/${threadId}/runs/stream`, {
     method: "POST",
@@ -189,6 +185,11 @@ export async function streamMessage(
           const errMsg = parsed?.message || parsed?.error || "Unknown server error";
           callbacks.onError(new Error(errMsg));
           return;
+        }
+
+        if (currentEvent === "status" && typeof parsed?.label === "string") {
+          callbacks.onStatus?.(parsed.label);
+          continue;
         }
 
         // messages/partial: accumulated AI content as array with one object

@@ -1,5 +1,5 @@
 {$DOMAIN:medoxai.com} {
-	# Backend API — proxy to LangGraph server
+	# Backend API — FastAPI
 	handle /api/* {
 		uri strip_prefix /api
 		reverse_proxy backend:2024

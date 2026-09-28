@@ -1,17 +1,10 @@
-import { test, expect, type Page } from "@playwright/test";
-
-/** Set a fake API key so /chat doesn't redirect to /setup. */
-async function setFakeApiKey(page: Page) {
-  await page.addInitScript(() => {
-    localStorage.setItem("medox:apiKey", "sk-or-test-key-for-e2e");
-  });
-}
+import { test, expect } from "@playwright/test";
 
 test.describe("Medox Landing Page", () => {
   test("shows landing page at /", async ({ page }) => {
     await page.goto("/");
     await expect(page.getByTestId("enter-app-btn")).toBeVisible();
-    await expect(page.getByText("Medox")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Medox" })).toBeVisible();
     await expect(
       page.getByText("Assistant pharmaceutique intelligent"),
     ).toBeVisible();
@@ -19,15 +12,7 @@ test.describe("Medox Landing Page", () => {
     await expect(page.getByText("data.gouv.fr")).toBeVisible();
   });
 
-  test("enter button navigates to /setup without API key", async ({ page }) => {
-    await page.goto("/");
-    await page.getByTestId("enter-app-btn").click();
-    await expect(page).toHaveURL(/\/setup/);
-    await expect(page.getByTestId("api-key-input")).toBeVisible();
-  });
-
-  test("enter button navigates to /chat with API key", async ({ page }) => {
-    await setFakeApiKey(page);
+  test("enter button opens the chat", async ({ page }) => {
     await page.goto("/");
     await page.getByTestId("enter-app-btn").click();
     await expect(page).toHaveURL(/\/chat/);
@@ -35,32 +20,8 @@ test.describe("Medox Landing Page", () => {
   });
 });
 
-test.describe("Medox Setup", () => {
-  test("shows setup screen at /setup", async ({ page }) => {
-    await page.goto("/setup");
-    await expect(page.getByTestId("api-key-input")).toBeVisible();
-    await expect(page.getByTestId("save-key-btn")).toBeVisible();
-    await expect(page.getByRole("link", { name: "OpenRouter" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Mistral AI" })).toBeVisible();
-  });
-
-  test("validates empty key", async ({ page }) => {
-    await page.goto("/setup");
-    await page.getByTestId("save-key-btn").click();
-    await expect(page.getByText("API key is required")).toBeVisible();
-  });
-
-  test("saves key and navigates to /chat", async ({ page }) => {
-    await page.goto("/setup");
-    await page.getByTestId("api-key-input").fill("sk-or-test-key-12345678");
-    await page.getByTestId("save-key-btn").click();
-    await expect(page).toHaveURL(/\/chat/);
-  });
-});
-
 test.describe("Medox App", () => {
   test.beforeEach(async ({ page }) => {
-    await setFakeApiKey(page);
     await page.goto("/chat");
   });
 
@@ -117,7 +78,6 @@ test.describe("Medox App", () => {
 
 test.describe("Medox Sidebar", () => {
   test.beforeEach(async ({ page }) => {
-    await setFakeApiKey(page);
     await page.goto("/chat");
   });
 
@@ -194,7 +154,6 @@ test.describe("Medox Sidebar", () => {
 
 test.describe("Medox Chat Messages", () => {
   test("sends a message and displays it", async ({ page }) => {
-    await setFakeApiKey(page);
     await page.route("**/api/threads", async (route) => {
       if (route.request().method() === "POST") {
         const url = route.request().url();
@@ -266,7 +225,6 @@ test.describe("Medox Chat Messages", () => {
   test("displays warning banner for critical interactions", async ({
     page,
   }) => {
-    await setFakeApiKey(page);
     await page.route("**/api/threads/search", async (route) => {
       await route.fulfill({
         status: 200,
@@ -336,7 +294,6 @@ test.describe("Medox Mobile", () => {
   test.use({ viewport: { width: 375, height: 812 } });
 
   test("sidebar is hidden on mobile by default @mobile", async ({ page }) => {
-    await setFakeApiKey(page);
     await page.goto("/chat");
     const sidebar = page.getByTestId("sidebar");
     await expect(sidebar).toHaveCSS("transform", /matrix/);
@@ -347,7 +304,6 @@ test.describe("Medox Mobile", () => {
   });
 
   test("hamburger menu opens sidebar on mobile @mobile", async ({ page }) => {
-    await setFakeApiKey(page);
     await page.goto("/chat");
     await page.getByTestId("menu-btn").click();
     await expect(page.getByTestId("sidebar-overlay")).toBeVisible();
@@ -356,7 +312,6 @@ test.describe("Medox Mobile", () => {
 
 test.describe("Medox Settings", () => {
   test.beforeEach(async ({ page }) => {
-    await setFakeApiKey(page);
     await page.goto("/chat");
   });
 
@@ -387,38 +342,6 @@ test.describe("Medox Settings", () => {
     // Click the backdrop (top-left corner, outside the modal)
     await dialog.click({ position: { x: 10, y: 10 } });
     await expect(dialog).not.toBeVisible();
-  });
-
-  test("shows masked current API key", async ({ page }) => {
-    await page.getByTestId("settings-btn").click();
-    await expect(page.getByText("sk-or-te...-e2e")).toBeVisible();
-    await expect(page.getByText("Active")).toBeVisible();
-  });
-
-  test("can update API key", async ({ page }) => {
-    await page.getByTestId("settings-btn").click();
-    await page.getByTestId("settings-api-key-input").fill("sk-or-new-key-1234567890");
-    await page.getByTestId("settings-save-btn").click();
-    await expect(page.getByText("Key updated.")).toBeVisible();
-  });
-
-  test("validates short API key", async ({ page }) => {
-    await page.getByTestId("settings-btn").click();
-    await page.getByTestId("settings-api-key-input").fill("short");
-    await page.getByTestId("settings-save-btn").click();
-    await expect(page.getByText("doesn't look like a valid")).toBeVisible();
-  });
-
-  test("validates empty API key", async ({ page }) => {
-    await page.getByTestId("settings-btn").click();
-    await page.getByTestId("settings-save-btn").click();
-    await expect(page.getByText("API key is required")).toBeVisible();
-  });
-
-  test("remove key redirects to setup", async ({ page }) => {
-    await page.getByTestId("settings-btn").click();
-    await page.getByTestId("settings-remove-btn").click();
-    await expect(page).toHaveURL(/\/setup/);
   });
 
   test("shows conversation count", async ({ page }) => {

@@ -1,13 +1,10 @@
 """Find generic equivalents for a drug by CIS code (SQL — Silver layer)."""
 
-from langchain_core.tools import tool
-
 from medox.agent.queries import find_generics_by_cis
 
 TYPE_LABELS = {"0": "Princeps", "1": "Générique", "2": "Générique par assimilation", "4": "CPP"}
 
 
-@tool
 def find_generics(cis: str) -> str:
     """
     Find generic equivalents for a drug identified by its CIS code.

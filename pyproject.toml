@@ -1,13 +1,13 @@
 [project]
 name = "medox"
 version = "0.2.2"
-description = "Agent LangGraph spécialisé dans les référentiels médicamenteux français"
+description = "Assistant d'interactions médicamenteuses (BDPM, ANSM) servi par FastAPI"
 requires-python = ">=3.11"
 dependencies = [
-    # Agent
-    "langgraph>=0.2",
-    "langchain-openai>=0.2",
-    "langchain-community>=0.3",
+    # API
+    "fastapi>=0.141.1",
+    "uvicorn>=0.41.0",
+    "mistralai>=3.0.0",
     # Data
     "dagster>=1.8",
     "dagster-webserver>=1.8",
@@ -23,11 +23,13 @@ dependencies = [
     # Vector DB
     "chromadb>=0.5",
     "sentence-transformers>=3.0",
-    "langgraph-cli[inmem]>=0.1",
     # Config & Typing
     "pydantic>=2.8",
     "pydantic-settings>=2.4",
     "python-dotenv>=1.0",
+    "mistralai>=3.0.0",
+    "fastapi>=0.141.1",
+    "uvicorn>=0.41.0",
 ]
 
 [project.optional-dependencies]
@@ -39,8 +41,6 @@ dev = [
     "sqlfluff>=3.0",
     "sqlfluff-templater-dbt>=3.0",
     "pandas-stubs>=2.2",
-    # Evaluation
-    "langsmith>=0.7",
     "pyyaml>=6.0",
 ]
 
@@ -71,7 +71,6 @@ module = [
     "dagster_dbt.*",
     "pdfplumber.*",
     "sentence_transformers.*",
-    "langsmith.*",
     "forbiddenfruit.*",
 ]
 ignore_missing_imports = true
@@ -81,6 +80,7 @@ ignore_errors = true
 testpaths = ["tests"]
 markers = [
     "integration: requires Docker stack (PostgreSQL + ChromaDB)",
+    "eval: live Jev judge, needs MEDOX_EVAL=1 and TYPESAFE_API_KEY",
 ]
 
 [tool.dagster]

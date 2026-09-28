@@ -42,7 +42,7 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
           max-w-2xl mx-auto flex items-end gap-2
           bg-surface-raised border border-surface-border/60 rounded-2xl
           pl-5 pr-2 py-2
-          focus-within:border-accent/30 focus-within:shadow-[0_0_0_1px_rgba(255,255,255,0.05),0_2px_12px_rgba(0,0,0,0.15)]
+          focus-within:border-accent/40 focus-within:shadow-soft
           transition-all duration-300
         "
       >

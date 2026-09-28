@@ -4,11 +4,11 @@ import re
 import unicodedata
 
 import chromadb
-from langchain_core.tools import tool
 
 from medox.agent.queries import find_interactions
 from medox.pipeline.config_pipeline import PipelineSettings
 from medox.pipeline.io.embedder_local import get_embedding_function
+from medox.retrieval.hits import display_document, semantic_query
 
 
 def _normalize(name: str) -> str:
@@ -27,7 +27,6 @@ def _substance_matches_query(substance: str, query_a: str, query_b: str) -> bool
     return False
 
 
-@tool
 def check_interactions(substance_a: str, substance_b: str) -> str:
     """
     Check ANSM Thésaurus for the interaction between two substances.
@@ -72,16 +71,12 @@ def check_interactions(substance_a: str, substance_b: str) -> str:
         embedding_function=ef,  # type: ignore[arg-type]
     )
 
-    vector_results = collection.query(
-        query_texts=[f"{substance_a} {substance_b}"],
-        n_results=3,
-        include=["documents", "metadatas"],
-    )
+    hits = semantic_query(collection, f"{substance_a} {substance_b}", n_results=8)
 
     vector_lines: list[str] = []
-    docs = (vector_results["documents"] or [[]])[0]
-    metas = (vector_results["metadatas"] or [[]])[0]
-    for doc, meta in zip(docs, metas):
+    for hit in hits:
+        meta = hit.metadata
+        doc = display_document(hit.document)
         sa, sb = str(meta["substance_a"]), str(meta["substance_b"])
         if not (
             _substance_matches_query(sa, substance_a, substance_b)

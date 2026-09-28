@@ -42,7 +42,7 @@ export function ErrorPage() {
           </svg>
         </div>
 
-        <h1 className="font-pixel text-2xl md:text-3xl text-danger mb-4">
+        <h1 className="font-serif text-4xl text-text-primary mb-4">
           SYSTEM DOWN
         </h1>
 
@@ -58,9 +58,8 @@ export function ErrorPage() {
           onClick={handleRetry}
           className="
             inline-flex items-center gap-2 px-6 py-2.5
-            bg-white text-black text-sm font-medium rounded-lg
-            hover:bg-accent-dim transition-all duration-200
-            pixel-shadow hover:translate-y-[-2px]
+            bg-accent text-white text-sm font-medium rounded-full
+            hover:bg-accent-dim transition-colors
           "
         >
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">

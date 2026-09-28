@@ -225,6 +225,7 @@ medox-*.csv
 data/bronze/
 data/silver/
 data/gold/
+data/app/
 
 # Medox — dbt
 dbt/target/
@@ -239,4 +240,12 @@ chroma/
 
 # Medox — Custom CA bundle (built locally, not versioned)
 certs/ca-bundle.pem
+
+# Screenshots and scratch images. Keep the assets the app and the README use.
 *.png
+!docs/favicon.png
+!docs/landing-preview.png
+!frontend/public/mistral.png
+!frontend/public/datagouv.png
+
+*.tsbuildinfo
