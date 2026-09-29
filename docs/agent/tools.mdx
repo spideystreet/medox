@@ -11,14 +11,14 @@ The agent has access to four tools, each backed by a specific data source. Tools
 
 | Tool | File | Data source | Description |
 |------|------|-------------|-------------|
-| `search_drug` | `tool_search_drug.py` | ChromaDB `idx_bdpm_medicament_v1` | Semantic search over BDPM drug specialties |
+| `search_drug` | `tool_search_drug.py` | pgvector `idx_bdpm_medicament_v1` | Semantic search over BDPM drug specialties |
 | `find_generics` | `tool_find_generics.py` | Silver `silver_bdpm__generique` | Find generic equivalents by CIS code |
-| `check_interactions` | `tool_check_interactions.py` | Silver `silver_ansm__substance_class` + `silver_ansm__interaction` + ChromaDB `idx_ansm_interaction_v1` | ANSM drug interaction lookup with auto-resolution |
+| `check_interactions` | `tool_check_interactions.py` | Silver `silver_ansm__substance_class` + `silver_ansm__interaction` + pgvector `idx_ansm_interaction_v1` | ANSM drug interaction lookup with auto-resolution |
 | `get_rcp` | `tool_get_rcp.py` | Silver `silver_bdpm__info_importante` | Retrieve the official RCP link for a specialty |
 
 ## `search_drug`
 
-Performs a **semantic vector search** against the BDPM drug index in ChromaDB.
+Performs a **semantic vector search** against the BDPM drug index in Postgres (`gold.embedding`).
 
 - Input: free-text query (drug name, INN, brand name)
 - Output: list of matching specialties with CIS code, denomination, form, marketing status
@@ -50,7 +50,7 @@ Dual-strategy lookup against the ANSM interaction data with **automatic substanc
 
 **Step 1 — SQL ILIKE (primary)**: searches all combinations of resolved class names + original names against `silver.silver_ansm__interaction`, sorted by constraint level severity. Both accented and normalized (unaccented) forms are used to handle PostgreSQL accent-sensitive ILIKE.
 
-**Step 2 — ChromaDB vector search (fallback)**: semantic search against `idx_ansm_interaction_v1` with lexical overlap filtering to prevent false positives. Results are deduplicated across both strategies.
+**Step 2 — pgvector search (fallback)**: semantic search against `idx_ansm_interaction_v1` with lexical overlap filtering to prevent false positives. Results are deduplicated across both strategies.
 
 When no interaction is found, the tool returns a prescriptive message instructing the LLM to report insufficient data rather than hallucinate.
 

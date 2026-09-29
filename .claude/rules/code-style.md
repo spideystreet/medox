@@ -18,6 +18,6 @@ Never hardcode default values for sensitive variables (passwords, API keys, user
 Use `env_var('VAR')` without fallback in dbt, `${VAR}` without `:-default` in Docker.
 Non-sensitive vars (host, port) may have defaults.
 
-## ChromaDB index naming
+## Gold index naming
 
 `idx_<source>_<content>_<model_version>` — e.g. `idx_bdpm_medicament_v1`, `idx_ansm_interaction_v1`

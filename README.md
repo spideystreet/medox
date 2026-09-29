@@ -46,7 +46,7 @@ Frontend at `localhost:5177` — API at `localhost:2024`
 ## Stack
 
 ```
-BDPM + ANSM → Dagster → dbt (PostgreSQL) → ChromaDB → FastAPI (Mistral) → React
+BDPM + ANSM → Dagster → dbt (PostgreSQL + pgvector) → FastAPI (Mistral) → React
 ```
 
 > **Disclaimer:** Medox is experimental. It does not replace professional medical advice.

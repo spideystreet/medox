@@ -1,5 +1,5 @@
 """
-Build ChromaDB documents (text + metadata) from Silver PostgreSQL tables.
+Build gold documents (text + metadata) from Silver PostgreSQL tables.
 One document per CIS for medicaments, one per interaction row for ANSM.
 """
 

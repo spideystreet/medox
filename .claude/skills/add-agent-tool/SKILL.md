@@ -61,4 +61,4 @@ argument-hint: "<tool-name>"
 - Tool file name: `tool_<name>.py` — matches the `@tool` function name
 - One `@tool` per file
 - Never raise exceptions — return a descriptive string on error
-- Requires Docker stack running for ChromaDB/PostgreSQL tools
+- Requires Docker stack running for PostgreSQL tools

@@ -5,13 +5,13 @@ FastAPI tool loop over BDPM and ANSM data. The server holds the model key.
 
 ## Tech Stack
 
-**Backend**: Python · FastAPI · Mistral SDK · Dagster · dbt · PostgreSQL · ChromaDB
+**Backend**: Python · FastAPI · Mistral SDK · Dagster · dbt · PostgreSQL · pgvector
 **Frontend**: React 18 · TypeScript · Vite · TanStack Router · TanStack Query · Tailwind CSS
 
 ## Architecture
 
 ```
-Bronze (raw files) → Silver (PostgreSQL via dbt) → Gold (ChromaDB)
+Bronze (raw files) → Silver (PostgreSQL via dbt) → Gold (pgvector)
                                                       ↓
                          FastAPI + Mistral tool loop
                                                       ↓
@@ -30,7 +30,7 @@ A critical ANSM level (`contre-indication`, `association déconseillée`) is pre
 |------|------|
 | `src/medox/api/` | FastAPI app, Mistral loop, SQLite threads |
 | `src/medox/agent/` | Tools, SQL queries, safety prefix |
-| `src/medox/retrieval/` | Chroma search, cosine cutoff, E5 prefixes |
+| `src/medox/retrieval/` | pgvector search, cosine cutoff, E5 prefixes |
 | `src/medox/eval/` | Jev judge |
 | `src/medox/pipeline/` | Dagster bronze, raw load, gold embeddings |
 | `dbt/` | Silver models and contracts |

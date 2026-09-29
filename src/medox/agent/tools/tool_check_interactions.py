@@ -1,14 +1,11 @@
-"""ANSM Thésaurus interaction lookup — dual SQL ILIKE + ChromaDB vector search."""
+"""ANSM Thésaurus interaction lookup — SQL ILIKE, then pgvector search."""
 
 import re
 import unicodedata
 
-import chromadb
-
 from medox.agent.queries import find_interactions
-from medox.pipeline.config_pipeline import PipelineSettings
-from medox.pipeline.io.embedder_local import get_embedding_function
-from medox.retrieval.hits import display_document, semantic_query
+from medox.retrieval.hits import display_document
+from medox.retrieval.index import INTERACTION_INDEX, search_collection
 
 
 def _normalize(name: str) -> str:
@@ -62,16 +59,7 @@ def check_interactions(substance_a: str, substance_b: str) -> str:
                 f"{'. '.join(parts)}"
             )
 
-    # Step 2: vector search — semantic fallback when class names are unknown
-    settings = PipelineSettings()
-    client = chromadb.HttpClient(host=settings.chroma_host, port=settings.chroma_port)
-    ef = get_embedding_function(settings.embedding_model)
-    collection = client.get_collection(
-        "idx_ansm_interaction_v1",
-        embedding_function=ef,  # type: ignore[arg-type]
-    )
-
-    hits = semantic_query(collection, f"{substance_a} {substance_b}", n_results=8)
+    hits = search_collection(INTERACTION_INDEX, f"{substance_a} {substance_b}", n_results=8)
 
     vector_lines: list[str] = []
     for hit in hits:

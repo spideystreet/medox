@@ -1,23 +1,25 @@
-"""
-Local embedding function for ChromaDB using sentence-transformers (HuggingFace).
-Model is downloaded and cached locally on first use — zero API cost, HDS-compatible.
-Singleton: the model is loaded once and reused across all calls.
-"""
+"""Local embeddings with sentence-transformers. The model is loaded once."""
 
 import threading
+from typing import Any
 
-from chromadb.utils.embedding_functions import SentenceTransformerEmbeddingFunction
-
-_instances: dict[str, SentenceTransformerEmbeddingFunction] = {}
+_models: dict[str, Any] = {}
 _lock = threading.Lock()
 
 
-def get_embedding_function(model_name: str) -> SentenceTransformerEmbeddingFunction:
-    """Return a singleton ChromaDB-compatible embedding function."""
-    if model_name not in _instances:
+def embed_texts(model_name: str, texts: list[str]) -> list[list[float]]:
+    """Embed texts with the named HuggingFace model. Empty input returns []."""
+    if not texts:
+        return []
+    vectors = _model(model_name).encode(list(texts), convert_to_numpy=True)
+    return [[float(value) for value in row] for row in vectors]
+
+
+def _model(model_name: str) -> Any:
+    if model_name not in _models:
         with _lock:
-            if model_name not in _instances:
-                _instances[model_name] = SentenceTransformerEmbeddingFunction(
-                    model_name=model_name,
-                )
-    return _instances[model_name]
+            if model_name not in _models:
+                from sentence_transformers import SentenceTransformer
+
+                _models[model_name] = SentenceTransformer(model_name)
+    return _models[model_name]
