@@ -72,7 +72,7 @@ export function Sidebar({
         <div className="p-4">
           <div className="flex items-center justify-between mb-4">
             <Link to="/" className="font-sans text-lg font-medium tracking-tight text-text-primary hover:text-accent transition-colors">
-              MEDOX
+              Medox
             </Link>
             <button
               className="md:hidden text-text-muted hover:text-text-primary transition-colors"

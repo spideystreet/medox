@@ -154,11 +154,23 @@ def _events(app: FastAPI, thread_id: str, text: str, api_key: str) -> Iterator[s
         yield _sse("end", None)
         return
 
-    ai = {"type": "ai", "content": conversation.answer, "id": _message_id("ai")}
+    ai = {
+        "type": "ai",
+        "content": conversation.answer,
+        "id": _message_id("ai"),
+        "sources": conversation.sources,
+    }
     store.save_turn(thread_id, [*prior, human, ai], conversation.interactions)
     yield _sse(
         "messages/partial",
-        [{"content": conversation.answer, "type": "ai", "id": ai["id"]}],
+        [
+            {
+                "content": conversation.answer,
+                "type": "ai",
+                "id": ai["id"],
+                "sources": conversation.sources,
+            }
+        ],
     )
     yield _sse("end", None)
 

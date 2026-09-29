@@ -8,6 +8,7 @@ from collections.abc import Callable, Iterator
 from typing import Any, Protocol
 
 from medox.agent.safety import parse_interaction_records, warning_prefix
+from medox.agent.sources import collect_sources
 
 MAX_ROUNDS = 6
 
@@ -114,9 +115,15 @@ Dispatch = Callable[[str, dict[str, Any]], str]
 
 
 class Conversation:
-    def __init__(self, answer: str, interactions: list[dict[str, str]]) -> None:
+    def __init__(
+        self,
+        answer: str,
+        interactions: list[dict[str, str]],
+        sources: list[dict[str, str]] | None = None,
+    ) -> None:
         self.answer = answer
         self.interactions = interactions
+        self.sources = sources or []
 
 
 class Activity:
@@ -146,13 +153,13 @@ def iter_conversation(
     """Yield a status before each model or tool step, then the final answer."""
     messages: list[dict[str, Any]] = [{"role": "system", "content": SYSTEM_PROMPT}]
     messages.extend({"role": item["role"], "content": item["content"]} for item in history)
-    tool_outputs: list[str] = []
+    tool_runs: list[tuple[str, str]] = []
 
     for _ in range(MAX_ROUNDS):
         yield Activity("Réflexion")
         turn = model.complete(messages, TOOLS)
         if not turn.tool_calls:
-            yield _finish(turn.content, tool_outputs)
+            yield _finish(turn.content, tool_runs)
             return
 
         messages.append(
@@ -178,7 +185,7 @@ def iter_conversation(
                 result = dispatch(call.name, call.arguments)
             except Exception as exc:
                 result = f"Tool {call.name} failed: {exc}"
-            tool_outputs.append(result)
+            tool_runs.append((call.name, result))
             messages.append(
                 {
                     "role": "tool",
@@ -188,7 +195,7 @@ def iter_conversation(
                 }
             )
 
-    yield _finish(None, tool_outputs, exhausted=True)
+    yield _finish(None, tool_runs, exhausted=True)
 
 
 def run_conversation(
@@ -207,18 +214,23 @@ def run_conversation(
 
 def _finish(
     content: str | None,
-    tool_outputs: list[str],
+    tool_runs: list[tuple[str, str]],
     *,
     exhausted: bool = False,
 ) -> Conversation:
-    interactions = parse_interaction_records(tool_outputs)
+    outputs = [output for _, output in tool_runs]
+    interactions = parse_interaction_records(outputs)
     if exhausted:
         body = "La recherche n'a pas abouti dans la limite d'étapes."
     else:
         body = (
             content or ""
         ).strip() or "Aucune réponse n'a pu être produite à partir des sources."
-    return Conversation(answer=warning_prefix(interactions) + body, interactions=interactions)
+    return Conversation(
+        answer=warning_prefix(interactions) + body,
+        interactions=interactions,
+        sources=collect_sources(tool_runs),
+    )
 
 
 def history_from_messages(messages: list[dict[str, Any]]) -> list[dict[str, str]]:

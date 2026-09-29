@@ -53,13 +53,13 @@ export function WelcomeScreen({ onSuggestionClick }: WelcomeScreenProps) {
         {/* Greeting */}
         <div className="mb-10">
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-accent/20 to-accent/5 border border-accent/10 mb-5">
-            <span className="font-serif text-lg text-accent">M</span>
+            <span className="font-sans text-sm font-medium text-accent">M</span>
           </div>
-          <h1 className="text-2xl md:text-3xl font-light text-text-primary mb-2 tracking-tight">
-            How can I help you?
+          <h1 className="text-2xl md:text-3xl font-medium tracking-tight text-text-primary mb-2">
+            Que dois-je vérifier ?
           </h1>
           <p className="text-text-muted text-sm">
-            Drug interactions, generics, compositions — powered by BDPM & ANSM
+            L&apos;agent consulte la BDPM & ANSM, puis cite ses sources.
           </p>
         </div>
 

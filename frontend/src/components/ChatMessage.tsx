@@ -1,26 +1,24 @@
+import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import type { CitedSource } from "../api/client";
 
 interface ChatMessageProps {
   role: "human" | "ai";
   content: string;
   isStreaming?: boolean;
+  sources?: CitedSource[];
 }
 
-export function ChatMessage({ role, content, isStreaming }: ChatMessageProps) {
+export function ChatMessage({ role, content, isStreaming, sources }: ChatMessageProps) {
   const isUser = role === "human";
 
   // Detect warning banners in content
-  const hasWarning = content.includes("\u26a0\ufe0f");
-  const hasDanger =
-    content.toLowerCase().includes("contre-indication") ||
-    content.toLowerCase().includes("association d\u00e9conseill\u00e9e");
+  const warning = warningLabel(content);
 
   // Extract SOURCES section
   const sourcesMatch = content.match(/SOURCES?\s*\n((?:CIS\s+\d+.*\n?)+)/i);
-  const cisCodes = sourcesMatch
-    ? sourcesMatch[1].match(/CIS\s+\d+/g) || []
-    : [];
+  const cited = mergeSources(content, sources);
   const mainContent = sourcesMatch
     ? content.slice(0, sourcesMatch.index).trim()
     : content;
@@ -41,27 +39,27 @@ export function ChatMessage({ role, content, isStreaming }: ChatMessageProps) {
         {/* Avatar */}
         <div className="shrink-0 mt-0.5">
           <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-accent/20 to-accent/5 border border-accent/10 flex items-center justify-center">
-            <span className="font-serif text-sm text-accent">M</span>
+            <span className="font-sans text-xs font-medium text-accent">M</span>
           </div>
         </div>
 
         {/* Content */}
         <div className="min-w-0 flex-1">
-          {hasWarning && (
+          {warning && (
             <div
-              className={`
-                mb-3 px-3 py-2.5 rounded-lg border text-sm flex items-center gap-2
-                ${
-                  hasDanger
-                    ? "bg-danger-bg/50 border-danger-border/50 text-danger"
-                    : "bg-warning-bg/50 border-warning-border/50 text-warning"
-                }
-              `}
+              className={`mb-3 inline-flex items-center gap-2 rounded-full border py-1 pl-2 pr-2.5 text-xs ${
+                warning.tone === "danger"
+                  ? "border-danger-border bg-danger-bg text-danger"
+                  : "border-warning-border bg-warning-bg text-warning"
+              }`}
               data-testid="warning-banner"
             >
-              <span className="font-sans text-[11px] tracking-[0.14em] shrink-0">
-                {hasDanger ? "DANGER" : "ALERTE"}
-              </span>
+              <span
+                className={`h-1.5 w-1.5 rounded-full ${
+                  warning.tone === "danger" ? "bg-danger" : "bg-warning"
+                }`}
+              />
+              {warning.label}
             </div>
           )}
 
@@ -107,26 +105,97 @@ export function ChatMessage({ role, content, isStreaming }: ChatMessageProps) {
             )}
           </div>
 
-          {cisCodes.length > 0 && (
-            <div className="mt-4 pt-3 border-t border-surface-border/40">
-              <span className="text-[10px] uppercase tracking-[0.15em] text-text-muted">
-                Sources
-              </span>
-              <div className="flex flex-wrap gap-1.5 mt-1.5">
-                {cisCodes.map((cis, i) => (
-                  <span
-                    key={i}
-                    className="font-mono text-[11px] px-2 py-0.5 rounded-md bg-surface-raised text-text-secondary"
-                    data-testid="cis-badge"
-                  >
-                    {cis}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
+          {cited.length > 0 && <SourceList sources={cited} />}
         </div>
       </div>
     </div>
+  );
+}
+
+function warningLabel(content: string): { label: string; tone: "danger" | "warning" } | null {
+  if (!content.includes("\u26a0\ufe0f")) return null;
+  const lower = content.toLowerCase();
+  if (lower.includes("contre-indication")) {
+    return { label: "Contre-indication", tone: "danger" };
+  }
+  if (lower.includes("association d\u00e9conseill\u00e9e")) {
+    return { label: "Association d\u00e9conseill\u00e9e", tone: "danger" };
+  }
+  return { label: "Alerte", tone: "warning" };
+}
+
+function mergeSources(content: string, given?: CitedSource[]): CitedSource[] {
+  const seen = new Set<string>();
+  const items: CitedSource[] = [];
+  const add = (source: CitedSource) => {
+    const key = `${source.kind}:${source.detail}`;
+    if (!source.detail || seen.has(key)) return;
+    seen.add(key);
+    items.push(source);
+  };
+  for (const source of given ?? []) add(source);
+  for (const match of content.match(/CIS\s+\d+/gi) ?? []) {
+    add({ kind: "bdpm", title: "BDPM", detail: match.replace(/\s+/, " ") });
+  }
+  return items;
+}
+
+function SourceList({ sources }: { sources: CitedSource[] }) {
+  const [open, setOpen] = useState(false);
+  const kinds = [...new Set(sources.map((source) => source.kind))];
+  const label = sources.length === 1 ? "1 source" : `${sources.length} sources`;
+
+  return (
+    <div className="mt-4">
+      <button
+        type="button"
+        data-testid="sources-badge"
+        aria-expanded={open}
+        onClick={() => setOpen((value) => !value)}
+        className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-surface-border bg-surface-raised py-1 pl-1.5 pr-3 text-xs text-text-secondary"
+      >
+        <span className="flex -space-x-1.5">
+          {kinds.map((kind) => (
+            <span key={kind} className="rounded-full ring-2 ring-surface-raised">
+              <SourceMark kind={kind} />
+            </span>
+          ))}
+        </span>
+        {label}
+      </button>
+      {open && (
+        <ul className="mt-2 space-y-1.5">
+          {sources.map((source) => (
+            <li key={`${source.kind}:${source.detail}`} className="flex items-center gap-2 text-sm">
+              <SourceMark kind={source.kind} />
+              <span className="text-text-secondary">{source.title}</span>
+              <span
+                className="truncate text-text-muted"
+                data-testid={/^CIS\s+\d+$/i.test(source.detail) ? "cis-badge" : undefined}
+              >
+                {source.detail}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+function SourceMark({ kind }: { kind: string }) {
+  if (kind === "bdpm") {
+    return (
+      <img
+        src="/datagouv.png"
+        alt=""
+        className="h-4 w-4 rounded-full bg-white object-contain"
+      />
+    );
+  }
+  return (
+    <span className="flex h-4 w-4 items-center justify-center rounded-full bg-[#12324d] text-[8px] font-semibold text-white">
+      A
+    </span>
   );
 }

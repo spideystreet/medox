@@ -39,7 +39,7 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
     <div className="px-4 pb-4 pt-2">
       <div
         className="
-          max-w-2xl mx-auto flex items-end gap-2
+          max-w-2xl mx-auto flex items-center gap-2
           bg-surface-raised border border-surface-border/60 rounded-2xl
           pl-5 pr-2 py-2
           focus-within:border-accent/40 focus-within:shadow-soft

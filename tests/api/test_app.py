@@ -88,6 +88,9 @@ def test_stream_persists_the_answer_and_warns(
     assert contents[0] == "Interaction ?"
     assert contents[1].startswith("⚠️")
     assert "Association à éviter." in contents[1]
+    sources = state["values"]["messages"][1]["sources"]
+    assert sources[0]["kind"] == "ansm"
+    assert "Thésaurus ANSM" == sources[0]["title"]
 
 
 def test_missing_key_is_an_error_event(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
