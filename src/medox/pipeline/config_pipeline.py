@@ -14,10 +14,6 @@ class PipelineSettings(BaseSettings):
     postgres_password: str
     postgres_db: str
 
-    # ChromaDB
-    chroma_host: str
-    chroma_port: int
-
     # OpenRouter (optional — only needed for Dagster pipeline, not for BYOK agent)
     openrouter_api_key: str = ""
     openrouter_base_url: str = "https://openrouter.ai/api/v1"

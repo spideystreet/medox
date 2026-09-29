@@ -8,7 +8,7 @@ cp .env.example .env
 
 ## Docker
 ```bash
-docker compose up -d    # PostgreSQL + ChromaDB
+docker compose up -d    # PostgreSQL with pgvector
 docker compose down
 ```
 

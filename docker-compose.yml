@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: postgres:16
+    image: pgvector/pgvector:pg16
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -15,20 +15,5 @@ services:
       timeout: 5s
       retries: 5
 
-  chromadb:
-    image: chromadb/chroma:latest
-    ports:
-      - "${CHROMA_PORT:-8000}:8000"
-    volumes:
-      - chroma_data:/chroma/chroma
-    environment:
-      IS_PERSISTENT: "TRUE"
-    healthcheck:
-      test: ["CMD-SHELL", "bash -c 'echo > /dev/tcp/localhost/8000'"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
 volumes:
   postgres_data:
-  chroma_data:

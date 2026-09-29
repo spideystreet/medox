@@ -1,12 +1,11 @@
 """
-Gold layer — Vector embeddings stored in ChromaDB.
+Gold layer — vector embeddings stored in Postgres with pgvector.
 Index naming: idx_<source>_<content>_<model_version>
-Metadata filtering by CIS (drug specialty) and CIP13 (presentation/box).
 """
 
-import chromadb
-from chromadb.api import ClientAPI
-from chromadb.utils.embedding_functions import SentenceTransformerEmbeddingFunction
+from collections.abc import Callable
+from typing import Any
+
 from dagster import AssetExecutionContext, AssetKey, asset
 from sqlalchemy import create_engine
 
@@ -15,8 +14,8 @@ from medox.pipeline.io.builder_documents import (
     build_interaction_documents,
     build_medicament_documents,
 )
-from medox.pipeline.io.embedder_local import get_embedding_function
-from medox.retrieval.hits import COLLECTION_METADATA
+from medox.pipeline.io.embedder_local import embed_texts
+from medox.retrieval.index import INTERACTION_INDEX, MEDICAMENT_INDEX, replace_collection
 
 BATCH_SIZE = 100
 
@@ -30,71 +29,45 @@ BATCH_SIZE = 100
     ],
 )
 def gold_embeddings(context: AssetExecutionContext) -> None:
-    """
-    Build and upsert ChromaDB collections from Silver tables.
-    Collections: idx_bdpm_medicament_v1, idx_ansm_interaction_v1
-    """
+    """Embed Silver tables into gold.embedding."""
     settings = PipelineSettings()
     engine = create_engine(settings.postgres_dsn)
 
-    ef = get_embedding_function(settings.embedding_model)
-
-    client = chromadb.HttpClient(host=settings.chroma_host, port=settings.chroma_port)
-
-    med_count = _upsert_collection(
-        client=client,
-        ef=ef,
-        name="idx_bdpm_medicament_v1",
-        builder=lambda: build_medicament_documents(engine),
-        context=context,
+    med_count = _load(
+        engine,
+        settings.embedding_model,
+        MEDICAMENT_INDEX,
+        lambda: build_medicament_documents(engine),
+        context,
     )
-
-    int_count = _upsert_collection(
-        client=client,
-        ef=ef,
-        name="idx_ansm_interaction_v1",
-        builder=lambda: build_interaction_documents(engine),
-        context=context,
+    int_count = _load(
+        engine,
+        settings.embedding_model,
+        INTERACTION_INDEX,
+        lambda: build_interaction_documents(engine),
+        context,
     )
-
     context.add_output_metadata(
         {
-            "idx_bdpm_medicament_v1": med_count,
-            "idx_ansm_interaction_v1": int_count,
+            MEDICAMENT_INDEX: med_count,
+            INTERACTION_INDEX: int_count,
         }
     )
 
 
-def _upsert_collection(
-    client: ClientAPI,
-    ef: SentenceTransformerEmbeddingFunction,
-    name: str,
-    builder: object,
+def _load(
+    engine: Any,
+    model_name: str,
+    collection: str,
+    builder: Callable[[], tuple[list[str], list[str], list[dict[str, Any]]]],
     context: AssetExecutionContext,
 ) -> int:
-    """Recreate a ChromaDB collection from scratch and populate it in batches.
-
-    delete_collection + create_collection ensures stale entries are removed.
-    """
-    try:
-        client.delete_collection(name=name)
-    except Exception:
-        pass  # Collection may not exist yet on first run
-    collection = client.create_collection(
-        name=name,
-        embedding_function=ef,  # type: ignore[arg-type]
-        metadata=COLLECTION_METADATA,
-    )
-
-    ids, documents, metadatas = builder()  # type: ignore[operator]
-    total = len(ids)
-
-    for i in range(0, total, BATCH_SIZE):
-        collection.upsert(
-            ids=ids[i : i + BATCH_SIZE],
-            documents=documents[i : i + BATCH_SIZE],
-            metadatas=metadatas[i : i + BATCH_SIZE],
-        )
-        context.log.info(f"[gold] {name} — upserted {min(i + BATCH_SIZE, total)}/{total}")
-
-    return total
+    ids, documents, metadatas = builder()
+    embeddings: list[list[float]] = []
+    total = len(documents)
+    for start in range(0, total, BATCH_SIZE):
+        embeddings.extend(embed_texts(model_name, documents[start : start + BATCH_SIZE]))
+        context.log.info(f"[gold] {collection} — embedded {min(start + BATCH_SIZE, total)}/{total}")
+    count = replace_collection(engine, collection, ids, documents, metadatas, embeddings)
+    context.log.info(f"[gold] {collection} — stored {count}")
+    return count

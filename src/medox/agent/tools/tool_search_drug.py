@@ -1,10 +1,7 @@
-"""Semantic drug search in ChromaDB idx_bdpm_medicament_v1."""
+"""Semantic drug search in the pgvector index idx_bdpm_medicament_v1."""
 
-import chromadb
-
-from medox.pipeline.config_pipeline import PipelineSettings
-from medox.pipeline.io.embedder_local import get_embedding_function
-from medox.retrieval.hits import display_document, semantic_query
+from medox.retrieval.hits import display_document
+from medox.retrieval.index import MEDICAMENT_INDEX, search_collection
 
 
 def search_drug(query: str) -> str:
@@ -12,13 +9,8 @@ def search_drug(query: str) -> str:
     Search for drug information by name, active substance, or description.
     Returns up to 5 relevant drugs with their CIS code, denomination, and key metadata.
     """
-    settings = PipelineSettings()
-    client = chromadb.HttpClient(host=settings.chroma_host, port=settings.chroma_port)
-    ef = get_embedding_function(settings.embedding_model)
-
-    collection = client.get_collection("idx_bdpm_medicament_v1", embedding_function=ef)  # type: ignore[arg-type]
-    where = {"cis": int(query)} if query.strip().isdigit() else None
-    hits = semantic_query(collection, query, n_results=8, where=where)
+    where = {"cis": query.strip()} if query.strip().isdigit() else None
+    hits = search_collection(MEDICAMENT_INDEX, query, n_results=8, where=where)
 
     if not hits:
         return f"No drugs found for query: {query!r}"

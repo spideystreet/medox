@@ -27,10 +27,10 @@ description: "Medox — agent IA spécialisé dans les référentiels pharmaceut
 ```
 Bronze  →  Fichiers bruts sur disque     data/bronze/{bdpm/, ansm/}
 Silver  →  SQL normalisé                 PostgreSQL schemas: raw → silver (via dbt)
-Gold    →  Embeddings vectoriels         ChromaDB (self-hosted)
+Gold    →  Embeddings vectoriels         PostgreSQL (pgvector)
 ```
 
-Les données brutes sont téléchargées depuis les sources officielles, parsées, transformées par dbt, puis indexées dans ChromaDB pour la recherche sémantique.
+Les données brutes sont téléchargées depuis les sources officielles, parsées, transformées par dbt, puis indexées dans Postgres (`pgvector`) pour la recherche sémantique.
 
 ## Cas d'usage
 
@@ -50,7 +50,7 @@ Medox est un outil d'information. Il ne remplace pas l'avis d'un professionnel d
 | Orchestration | Dagster |
 | Transformations SQL | dbt (PostgreSQL) |
 | Embeddings | `intfloat/multilingual-e5-base` (local) |
-| Vector store | ChromaDB (self-hosted) |
+| Vector store | PostgreSQL pgvector |
 | Agent framework | LangGraph (ReAct) |
 | LLM | OpenRouter (configurable) |
 | Observabilité | LangSmith (optionnel) |

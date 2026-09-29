@@ -10,7 +10,7 @@ paths:
 ```
 Bronze  →  Raw files on disk          data/bronze/{bdpm/, ansm/}
 Silver  →  Normalized SQL             PostgreSQL schemas: raw → silver (via dbt)
-Gold    →  Vector embeddings          ChromaDB (self-hosted)
+Gold    →  Vector embeddings          PostgreSQL pgvector (gold.embedding)
 ```
 
 Orchestration: **Dagster**. Transformations: **dbt + Python**.

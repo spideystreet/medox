@@ -1,11 +1,10 @@
-"""Retrieval ranking. No Chroma server required."""
+"""Retrieval ranking. No database required."""
 
 from medox.retrieval.hits import (
     Hit,
     display_document,
     filter_hits,
     prepare_query,
-    rows_from_query,
 )
 
 
@@ -51,23 +50,3 @@ class TestFilterHits:
         hits = [_hit(1.4, "a"), _hit(0.2, "b")]
         kept = filter_hits(hits, space="l2", limit=2)
         assert [hit.document for hit in kept] == ["b", "a"]
-
-
-class TestRowsFromQuery:
-    def test_aligns_parallel_lists(self) -> None:
-        hits = rows_from_query(
-            {
-                "documents": [["passage: A"]],
-                "metadatas": [[{"cis": 12}]],
-                "distances": [[0.1]],
-                "ids": [["12"]],
-            }
-        )
-        assert len(hits) == 1
-        assert hits[0].document == "passage: A"
-        assert hits[0].metadata["cis"] == 12
-        assert hits[0].distance == 0.1
-        assert hits[0].hit_id == "12"
-
-    def test_empty_response(self) -> None:
-        assert rows_from_query({}) == []

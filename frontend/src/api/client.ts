@@ -34,6 +34,13 @@ export interface Message {
   content: string;
   id: string;
   name?: string;
+  sources?: CitedSource[];
+}
+
+export interface CitedSource {
+  kind: "bdpm" | "ansm" | "notice" | string;
+  title: string;
+  detail: string;
 }
 
 export interface ThreadState {

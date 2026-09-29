@@ -53,14 +53,6 @@ cp .env.example .env
 | `POSTGRES_HOST` | Non | Hôte (défaut: `localhost`) |
 | `POSTGRES_PORT` | Non | Port (défaut: `5432`) |
 
-#### ChromaDB
-
-| Variable | Obligatoire | Description |
-|----------|------------|-------------|
-| `CHROMA_HOST` | Non | Hôte ChromaDB (défaut: `localhost`) |
-| `CHROMA_PORT` | Non | Port ChromaDB (défaut: `8000`) |
-| `CHROMA_PERSIST_DIR` | Non | Répertoire de persistance (défaut: `data/gold/chroma`) |
-
 #### Dagster
 
 | Variable | Obligatoire | Description |
@@ -92,7 +84,7 @@ bash scripts/build_ca_bundle.sh
 ## Services Docker
 
 ```bash
-# Démarrer PostgreSQL + ChromaDB
+# Démarrer PostgreSQL (image pgvector)
 docker compose up -d
 
 # Arrêter les services
@@ -106,8 +98,7 @@ docker compose ps
 
 | Service | Port | Description |
 |---------|------|-------------|
-| PostgreSQL | `5432` | Base de données |
-| ChromaDB | `8000` | Vector store HTTP API |
+| PostgreSQL | `5432` | Base relationnelle et index vectoriel (`pgvector`) |
 
 ## Vérification de l'installation
 

@@ -38,7 +38,7 @@ Use this agent when:
 3. **Report results** after the run:
    - Which cases passed / failed
    - For failures: which assertion failed (`missing: X`, `unexpected: Y`, `missing warn notice`)
-   - Suggest root cause (wrong tool called, interaction not found in ChromaDB, etc.)
+   - Suggest root cause (wrong tool called, interaction not found in the gold index, etc.)
 
 4. **Regression check**: if asked to compare runs, fetch both experiment names and diff the scores.
 

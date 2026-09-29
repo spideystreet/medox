@@ -15,9 +15,9 @@ Shared fixtures in `tests/conftest.py`.
 | Marker | Meaning | Requires |
 |--------|---------|---------|
 | *(none)* | Pure unit test | Nothing — runs anywhere |
-| `@pytest.mark.integration` | Hits PostgreSQL or ChromaDB | Docker stack up |
+| `@pytest.mark.integration` | Hits PostgreSQL (including pgvector) | Docker stack up |
 
-Always mark tests that open a DB connection or call ChromaDB with `@pytest.mark.integration`.
+Always mark tests that open a DB connection with `@pytest.mark.integration`.
 
 ## Running tests
 

@@ -13,9 +13,9 @@ The served agent is `src/medox/api/agent.py`: a Mistral tool loop, at most six r
 
 | File | Function | Data |
 |------|----------|------|
-| `tool_search_drug.py` | `search_drug` | Chroma `idx_bdpm_medicament_v1` |
+| `tool_search_drug.py` | `search_drug` | pgvector `idx_bdpm_medicament_v1` |
 | `tool_find_generics.py` | `find_generics` | Silver generics |
-| `tool_check_interactions.py` | `check_interactions` | Silver interactions and classes, then Chroma |
+| `tool_check_interactions.py` | `check_interactions` | Silver interactions and classes, then pgvector |
 | `tool_get_rcp.py` | `get_rcp` | ANSM safety notices in `silver_bdpm__info_importante` (not the full RCP) |
 
 SQL lives in `agent/queries.py`.

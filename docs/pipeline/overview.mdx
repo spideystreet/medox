@@ -11,7 +11,7 @@ Le pipeline de données Medox suit une architecture **Bronze → Silver → Gold
 |--------|------|----------|
 | **Bronze** | Données brutes téléchargées telles quelles | `data/bronze/{bdpm/, ansm/}` (fichiers disque) |
 | **Silver** | Données normalisées et validées | PostgreSQL — schémas `raw` puis `silver` (via dbt) |
-| **Gold** | Embeddings vectoriels pour la recherche sémantique | ChromaDB (self-hosted) |
+| **Gold** | Embeddings vectoriels pour la recherche sémantique | PostgreSQL `gold.embedding` (pgvector) |
 
 L'orchestration est assurée par **Dagster**. Les transformations SQL sont gérées par **dbt**.
 
@@ -34,11 +34,11 @@ ansm_thesaurus_raw ─┬► ansm_to_raw ────────┤
 | `ansm_to_raw` | bronze | Parse le PDF ANSM (pdfplumber) → insère dans `raw.ansm_thesaurus` |
 | `ansm_classes_to_raw` | silver | Parse les mappings substance→classe depuis le PDF ANSM → insère dans `raw.ansm_substance_class` |
 | `silver_dbt` | silver | Exécute les modèles dbt `silver_bdpm__*` et `silver_ansm__*` |
-| `gold_embeddings` | gold | Génère les embeddings et les upserte dans ChromaDB |
+| `gold_embeddings` | gold | Génère les embeddings et les écrit dans `gold.embedding` |
 
 ## Orchestration Dagster
 
-L'entrypoint Dagster est dans `pipeline/definitions.py`. Les ressources (connexion PostgreSQL, ChromaDB) sont injectées via `PipelineSettings`.
+L'entrypoint Dagster est dans `pipeline/definitions.py`. La connexion PostgreSQL est lue via `PipelineSettings`.
 
 ```bash
 # Lancer l'interface Dagster

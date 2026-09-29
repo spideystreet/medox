@@ -12,7 +12,7 @@ disable-model-invocation: true
    ```bash
    docker compose ps
    ```
-   If PostgreSQL or ChromaDB is not up:
+   If PostgreSQL is not up:
    ```bash
    docker compose up -d
    ```

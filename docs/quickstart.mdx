@@ -46,7 +46,7 @@ SSL_CERT_FILE="/chemin/absolu/vers/medox/certs/ca-bundle.pem"
 ```
 
 <Tip>
-Les variables `POSTGRES_HOST`, `POSTGRES_PORT`, `CHROMA_HOST`, `CHROMA_PORT` ont des valeurs par défaut (`localhost:5432`, `localhost:8000`) et n'ont pas besoin d'être modifiées pour un usage local.
+Les variables `POSTGRES_HOST` et `POSTGRES_PORT` ont des valeurs par défaut (`localhost:5432`) et n'ont pas besoin d'être modifiées pour un usage local.
 </Tip>
 
 ### Certificats SSL (sites gouvernementaux)
@@ -64,9 +64,7 @@ bash scripts/build_ca_bundle.sh
 docker compose up -d
 ```
 
-Cela démarre :
-- **PostgreSQL 16** sur le port `5432`
-- **ChromaDB** sur le port `8000`
+Cela démarre **PostgreSQL 16 avec pgvector**. Le port publié est `POSTGRES_PORT` (défaut `5432`).
 
 Vérifier que les services sont healthy :
 
@@ -91,7 +89,7 @@ uv run dagster asset materialize --select bronze
 # Silver — transformations dbt (raw → silver)
 uv run dagster asset materialize --select silver_dbt
 
-# Gold — embeddings ChromaDB
+# Gold — embeddings pgvector
 uv run dagster asset materialize --select gold_embeddings
 ```
 
