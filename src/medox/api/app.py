@@ -184,12 +184,8 @@ def _latest_human(messages: list[dict[str, Any]]) -> str:
 
 
 def _server_api_key() -> str:
-    """Key used for every chat. Never taken from the browser."""
-    for name in ("MISTRAL_API_KEY", "OPENROUTER_API_KEY"):
-        value = os.environ.get(name, "").strip()
-        if value:
-            return value
-    return ""
+    """OpenRouter key used for every chat. Never taken from the browser."""
+    return os.environ.get("OPENROUTER_API_KEY", "").strip()
 
 
 def _sse(event: str, data: Any) -> str:

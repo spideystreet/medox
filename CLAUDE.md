@@ -18,7 +18,7 @@ Bronze (raw files) → Silver (PostgreSQL via dbt) → Gold (pgvector)
                          React frontend (Vite, port 5177)
 ```
 
-Chat uses `MISTRAL_API_KEY`, or `OPENROUTER_API_KEY` if the Mistral key is empty. Visitors do not enter a key.
+Chat uses `OPENROUTER_API_KEY`. Visitors do not enter a key.
 
 BDPM download files are refreshed monthly. The ANSM interaction thesaurus is frozen (15 September 2023, online until 15 June 2027).
 

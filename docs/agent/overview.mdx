@@ -5,7 +5,7 @@ description: "Boucle d'outils FastAPI et SDK Mistral"
 
 L'agent servi en production est une boucle d'outils dans `src/medox/api/agent.py`. Le modèle est appelé via le SDK Mistral (`mistralai`). Tant qu'il demande un outil, le serveur l'exécute et renvoie le résultat. Au plus six tours.
 
-La clé est celle du serveur : `MISTRAL_API_KEY`, sinon `OPENROUTER_API_KEY`.
+La clé est celle du serveur : `OPENROUTER_API_KEY`. Le SDK Mistral appelle OpenRouter.
 
 ```python
 TOOLS = [search_drug, find_generics, check_interactions, get_rcp]

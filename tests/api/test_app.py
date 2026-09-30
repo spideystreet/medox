@@ -93,9 +93,21 @@ def test_stream_persists_the_answer_and_warns(
     assert "Thésaurus ANSM" == sources[0]["title"]
 
 
+def test_mistral_key_is_ignored(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("MISTRAL_API_KEY", "mistral-secret")
+    monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
+    client = _client(tmp_path, [Turn("nope", [])], [])
+    created = client.post("/threads", json={"metadata": {"user_id": "u1"}}).json()
+    response = client.post(
+        f"/threads/{created['thread_id']}/runs/stream",
+        json={"input": {"messages": [{"content": "Bonjour"}]}},
+    )
+    assert "event: error" in response.text
+    assert "no model API key" in response.text
+
+
 def test_missing_key_is_an_error_event(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
-    monkeypatch.delenv("MISTRAL_API_KEY", raising=False)
     client = _client(tmp_path, [Turn("nope", [])], [])
     created = client.post("/threads", json={"metadata": {"user_id": "u1"}}).json()
     response = client.post(

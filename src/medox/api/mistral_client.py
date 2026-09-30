@@ -1,26 +1,24 @@
-"""Official Mistral SDK client (mistralai 3).
+"""Chat client. The Mistral SDK talks to OpenRouter.
 
-OpenRouter keys use the same chat-completions shape via server_url.
-https://docs.mistral.ai/getting-started/quickstarts/developer/build-an-agent
+https://openrouter.ai/docs/quickstart
 """
 
 import json
+import os
 from typing import Any, cast
 
 from mistralai.client import Mistral
 
 from medox.api.agent import ToolCall, Turn
 
-MISTRAL_MODEL = "ministral-8b-latest"
 OPENROUTER_MODEL = "mistralai/ministral-8b-2512"
 OPENROUTER_SERVER = "https://openrouter.ai/api"
 
 
 def client_for_key(api_key: str) -> tuple[Mistral, str]:
-    """Return a SDK client and the model id for a Mistral or OpenRouter key."""
-    if api_key.startswith("sk-or-"):
-        return Mistral(api_key=api_key, server_url=OPENROUTER_SERVER), OPENROUTER_MODEL
-    return Mistral(api_key=api_key), MISTRAL_MODEL
+    """Return an OpenRouter client and the configured model id."""
+    model = os.environ.get("OPENROUTER_MODEL", "").strip() or OPENROUTER_MODEL
+    return Mistral(api_key=api_key, server_url=OPENROUTER_SERVER), model
 
 
 class MistralModel:
