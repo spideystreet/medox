@@ -7,7 +7,7 @@ paths:
 
 # Agent
 
-The served agent is `src/medox/api/agent.py`: a Mistral tool loop, at most six rounds. The server key is `MISTRAL_API_KEY`, else `OPENROUTER_API_KEY`.
+The served agent is `src/medox/api/agent.py`: a Mistral tool loop over OpenRouter, at most six rounds. The server key is `OPENROUTER_API_KEY`.
 
 ## Tools
 

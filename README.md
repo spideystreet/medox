@@ -39,7 +39,7 @@ uv run dotenv -f .env run -- uv run uvicorn medox.api.app:app --host 0.0.0.0 --p
 cd frontend && npm install && npm run dev
 ```
 
-Set `MISTRAL_API_KEY` or `OPENROUTER_API_KEY` in `.env`. Visitors do not bring a key.
+Set `OPENROUTER_API_KEY` in `.env`. Visitors do not bring a key.
 
 Frontend at `localhost:5177` — API at `localhost:2024`
 
